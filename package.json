@@ -2,27 +2,35 @@
   "name": "sunity-api",
   "version": "1.0.0",
   "description": "Express API scaffold with Drizzle ORM",
+  "keywords": [],
+  "homepage": "https://github.com/sayyidrafeed/sunity-api#readme",
+  "bugs": {
+    "url": "https://github.com/sayyidrafeed/sunity-api/issues"
+  },
+  "license": "ISC",
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sayyidrafeed/sunity-api.git"
+  },
+  "type": "module",
   "main": "dist/server.js",
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.1.0"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sayyidrafeed/sunity-api.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module",
-  "bugs": {
-    "url": "https://github.com/sayyidrafeed/sunity-api/issues"
-  },
-  "homepage": "https://github.com/sayyidrafeed/sunity-api#readme",
   "dependencies": {
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.2",
@@ -34,6 +42,8 @@
     "@types/node": "^25.5.0",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
