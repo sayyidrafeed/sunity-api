@@ -26,11 +26,6 @@ if (!googleClientSecret) {
   throw new Error("Missing GOOGLE_CLIENT_SECRET in environment variables");
 }
 
-const adminEmails = (process.env.ADMIN_EMAILS ?? "")
-  .split(",")
-  .map((value) => value.trim().toLowerCase())
-  .filter(Boolean);
-
 const adminSuccessRedirectPath = process.env.ADMIN_SUCCESS_REDIRECT_PATH ?? "/admin/dashboard";
 const adminFailureRedirectPath = process.env.ADMIN_FAILURE_REDIRECT_PATH ?? "/admin/login";
 
@@ -41,7 +36,6 @@ export const env = {
   betterAuthUrl,
   googleClientId,
   googleClientSecret,
-  adminEmails,
   adminSuccessRedirectPath,
   adminFailureRedirectPath,
 };

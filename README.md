@@ -55,8 +55,6 @@ How to redirect to admin after Google login:
 
 3. The success callback validates session presence and redirects to `/admin/dashboard`.
 
-To allow admin access, include admin emails in `ADMIN_EMAILS`.
-
 ## Optional: Use Bun
 
 If you prefer Bun, you can run this project with Bun as package manager/runtime.
