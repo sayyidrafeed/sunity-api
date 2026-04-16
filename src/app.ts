@@ -1,8 +1,12 @@
 import express from "express";
+import { toNodeHandler } from "better-auth/node";
 
-import { healthRouter } from "./routes/health.js";
+import { auth } from "./auth.js";
+import { adminRouter } from "./routes/admin.js";
 
 export const app = express();
 
+app.all("/api/auth/*splat", toNodeHandler(auth));
 app.use(express.json());
-app.use("/api", healthRouter);
+app.use("/api", adminRouter);
+app.use("/", adminRouter);

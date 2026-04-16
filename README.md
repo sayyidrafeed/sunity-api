@@ -28,9 +28,32 @@ npm run db:generate
 npm run dev
 ```
 
-Health endpoint:
+MVP placeholder endpoint:
 
-- `GET /api/health`
+- `GET /api/mvp/overview`
+
+## Authentication (Better Auth + Google)
+
+This API now mounts Better Auth on:
+
+- `ALL /api/auth/*`
+
+Important callback/session routes:
+
+- `GET /api/auth/callback/google` (handled by Better Auth)
+- `GET /api/admin/auth/callback?redirect=/admin/dashboard` (server-side callback resolver)
+- `GET /api/admin/dashboard` (protected admin route)
+- `GET /api/admin/session` (protected session inspector)
+
+How to redirect to admin after Google login:
+
+1. Start Google sign-in with Better Auth `callbackURL` set to:
+
+	- `/api/admin/auth/callback?redirect=/admin/dashboard`
+
+2. Better Auth completes OAuth callback, sets session cookie, and resolves to the success callback URL.
+
+3. The success callback validates session presence and redirects to `/admin/dashboard`.
 
 ## Optional: Use Bun
 
