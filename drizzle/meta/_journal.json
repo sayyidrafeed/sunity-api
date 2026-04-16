@@ -8,6 +8,13 @@
       "when": 1775063418194,
       "tag": "0000_uneven_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1776235700991,
+      "tag": "0001_living_guardsmen",
+      "breakpoints": true
     }
   ]
 }
