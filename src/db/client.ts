@@ -1,10 +1,9 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 import { env } from "../config/env.js";
 
-const pool = new Pool({
-  connectionString: env.databaseUrl,
-});
+// prepare: false required for edge/serverless environments (CF Workers, Bun)
+const client = postgres(env.databaseUrl, { prepare: false });
 
-export const db = drizzle({ client: pool });
+export const db = drizzle({ client });

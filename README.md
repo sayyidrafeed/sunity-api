@@ -48,8 +48,7 @@ Important callback/session routes:
 How to redirect to admin after Google login:
 
 1. Start Google sign-in with Better Auth `callbackURL` set to:
-
-	- `/api/admin/auth/callback?redirect=/admin/dashboard`
+   - `/api/admin/auth/callback?redirect=/admin/dashboard`
 
 2. Better Auth completes OAuth callback, sets session cookie, and resolves to the success callback URL.
 
