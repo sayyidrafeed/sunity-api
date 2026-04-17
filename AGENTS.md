@@ -8,23 +8,23 @@ and human contributors MUST follow these instructions.
 
 ## Stack
 
-| Layer             | Technology                                                                  |
-| ----------------- | --------------------------------------------------------------------------- |
-| Runtime           | Bun 1.1+ (primary), Node.js 20+ (compatibility)                             |
-| Language          | TypeScript 6+ in ESM mode                                                   |
-| Web framework     | Express 5                                                                   |
-| Database ORM      | Drizzle ORM + PostgreSQL (via `postgres` / postgres.js)                     |
-| Authentication    | Better Auth                                                                 |
-| Validation        | Zod + `drizzle-zod`                                                         |
-| OpenAPI spec      | `@asteasolutions/zod-to-openapi` + Better Auth `openAPI()` plugin           |
+| Layer             | Technology                                                                     |
+| ----------------- | ------------------------------------------------------------------------------ |
+| Runtime           | Bun 1.1+ (primary), Node.js 20+ (compatibility)                                |
+| Language          | TypeScript 6+ in ESM mode                                                      |
+| Web framework     | Express 5                                                                      |
+| Database ORM      | Drizzle ORM + PostgreSQL (via `postgres` / postgres.js)                        |
+| Authentication    | Better Auth                                                                    |
+| Validation        | Zod + `drizzle-zod`                                                            |
+| OpenAPI spec      | `@asteasolutions/zod-to-openapi` + Better Auth `openAPI()` plugin              |
 | API docs UI       | `@scalar/express-api-reference` (served at `/docs`, backed by `/openapi.json`) |
-| FE SDK generation | `@hey-api/openapi-ts` — run from the **frontend repo** (not installed here) |
-| Environment       | `dotenv` validated at startup in `src/env.ts`                               |
-| Formatter         | `oxfmt` (80-char print width)                                               |
-| Linter            | `oxlint` (strict rules)                                                     |
-| Type checker      | `tsgo --noEmit`                                                             |
-| Test runner       | `bun test`                                                                  |
-| CI sequence       | `bun run fl` → `bun run check` → `bun run build`                            |
+| FE SDK generation | `@hey-api/openapi-ts` — run from the **frontend repo** (not installed here)    |
+| Environment       | `dotenv` validated at startup in `src/env.ts`                                  |
+| Formatter         | `oxfmt` (80-char print width)                                                  |
+| Linter            | `oxlint` (strict rules)                                                        |
+| Type checker      | `tsgo --noEmit`                                                                |
+| Test runner       | `bun test`                                                                     |
+| CI sequence       | `bun run fl` → `bun run check` → `bun run build`                               |
 
 ---
 
