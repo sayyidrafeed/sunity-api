@@ -16,13 +16,14 @@ and human contributors MUST follow these instructions.
 | Database ORM      | Drizzle ORM + PostgreSQL (via `postgres` / postgres.js)                     |
 | Authentication    | Better Auth                                                                 |
 | Validation        | Zod + `drizzle-zod`                                                         |
-| OpenAPI spec      | `@asteasolutions/zod-to-openapi`                                            |
-| API docs UI       | `@scalar/express-api-reference` (served at `/docs`)                         |
+| OpenAPI spec      | `@asteasolutions/zod-to-openapi` + Better Auth `openAPI()` plugin           |
+| API docs UI       | `@scalar/express-api-reference` (served at `/docs`, backed by `/openapi.json`) |
 | FE SDK generation | `@hey-api/openapi-ts` — run from the **frontend repo** (not installed here) |
 | Environment       | `dotenv` validated at startup in `src/env.ts`                               |
 | Formatter         | `oxfmt` (80-char print width)                                               |
 | Linter            | `oxlint` (strict rules)                                                     |
 | Type checker      | `tsgo --noEmit`                                                             |
+| Test runner       | `bun test`                                                                  |
 | CI sequence       | `bun run fl` → `bun run check` → `bun run build`                            |
 
 ---
@@ -38,7 +39,7 @@ handlers, routes, and tests.
 ```
 src/
 ├── server.ts                  # Entry point — starts HTTP server
-├── app.ts                     # Express app: CORS, auth handler, route mounting, error handler
+├── app.ts                     # Express app: CORS, auth handler, unified OpenAPI, route mounting
 ├── auth.ts                    # Better Auth config (providers, hooks, RBAC)
 ├── env.ts                     # Environment variable validation (fail-fast on missing vars)
 ├── types/
@@ -51,7 +52,7 @@ src/
 │       └── index.ts           # Re-exports all tables
 ├── lib/                       # Shared kernel — no business logic
 │   ├── errors.ts              # Base AppError + common domain error classes
-│   ├── openapi.ts             # OpenAPIRegistry singleton + generateOpenAPIDocument()
+│   ├── openapi.ts             # OpenAPIRegistry singleton + mergeOpenAPIDocuments()
 │   ├── pagination.ts          # Pagination Zod schemas + query helpers
 │   ├── schemas.ts             # Shared Zod schemas (errorSchema, etc.)
 │   └── validate.ts            # validateBody / validateQuery / validateParams factories
@@ -98,6 +99,13 @@ modules/achievements/
 app.use("/api/admin/achievements", achievementsRouter);
 app.use("/api/achievements", publicAchievementsRouter);
 ```
+
+### OpenAPI / Scalar
+
+- `GET /openapi.json` is the single public OpenAPI source for the backend.
+- Merge app registry output with Better Auth schema output before serving JSON.
+- Serve `/docs` from that unified document instead of separate app/auth sources.
+- Re-check the unified schema whenever Better Auth plugins or auth routes change.
 
 ### Sub-Modules (Complex Domains)
 
@@ -194,6 +202,18 @@ interface User {
 - **Avoid type assertions (`as`)** except for the single cast of `req.validatedBody/Query/Params`
 - **Use `unknown`** when type is genuinely unknown, then narrow
 - **Use `export type`** for type-only exports
+
+---
+
+## Testing & TDD
+
+- Use `bun test` for all repository tests.
+- Follow TDD for features, bug fixes, and refactors:
+  - write the failing test first
+  - verify it fails for the right reason
+  - implement the minimal code to pass
+  - rerun the test before refactoring
+- Keep tests co-located under `src/modules/[module]/__tests__/`.
 
 ---
 
