@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
 import { db } from "./db/client.js";
 import { env } from "./config/env.js";
 import { users, sessions, accounts, verification } from "./db/schema/index.js";
@@ -48,4 +49,6 @@ export const auth = betterAuth({
       maxAge: 60 * 5,
     },
   },
+
+  plugins: [openAPI()],
 });
