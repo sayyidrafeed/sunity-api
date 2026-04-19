@@ -99,9 +99,26 @@ export function mergeOpenAPIDocuments(
     ) as OpenAPIComponents[keyof OpenAPIComponents];
   }
 
+  const externalPaths = externalDocument.paths ? { ...externalDocument.paths } : {};
+  for (const [path, pathItem] of Object.entries(externalPaths)) {
+    const clonedPathItem = { ...(pathItem as Record<string, unknown>) };
+    for (const [method, operation] of Object.entries(clonedPathItem)) {
+      if (operation && typeof operation === "object" && !Array.isArray(operation)) {
+        const op = operation as Record<string, unknown>;
+        if (typeof op.operationId === "string" && op.operationId) {
+          clonedPathItem[method] = {
+            ...op,
+            operationId: `${op.operationId}${method.charAt(0).toUpperCase()}${method.slice(1)}`,
+          };
+        }
+      }
+    }
+    externalPaths[path] = clonedPathItem;
+  }
+
   const mergedPaths = {
     ...appDocument.paths,
-    ...externalDocument.paths,
+    ...externalPaths,
   } as AppOpenAPIDocument["paths"];
 
   const mergedSecurity = [
