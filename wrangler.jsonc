@@ -4,13 +4,12 @@
   "main": "src/worker.ts",
   "compatibility_date": "2025-09-23",
   "compatibility_flags": ["nodejs_compat", "enable_nodejs_http_server_modules"],
-
   // Non-secret vars (secrets go via: wrangler secret put <KEY>)
   "vars": {
     "BETTER_AUTH_URL": "https://api.sunity.sayyidrafee.com",
-    "FRONTEND_URL": "https://sunity-web.vercel.app",
+    "FRONTEND_URL": "https://sunity.sayyidrafee.com",
     "FRONTEND_URLS": "https://sunity-web.vercel.app,http://localhost:5173,https://sunity.sayyidrafee.com",
-    "BETTER_AUTH_EXTRA_TRUSTED_ORIGINS": "https://api-sunity.vercel.app,https://api.sunity.sayyidrafee.com,https://sunity-api.sayyidrafeed.workers.dev",
+    "BETTER_AUTH_EXTRA_TRUSTED_ORIGINS": "http://localhost:3000,http://localhost:5173,https://sunity.sayyidrafee.com,https://api.sunity.sayyidrafee.com,https://api-sunity.vercel.app,https://sunity-api.sayyidrafeed.workers.dev",
     "NODE_ENV": "production",
     "PORT": "3000",
   },
