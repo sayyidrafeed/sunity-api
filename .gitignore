@@ -6,6 +6,7 @@ dist/
 .env.*
 !.env.example
 .dev.vars
+!.dev.vars.example
 
 # Logs
 *.log
@@ -26,3 +27,14 @@ coverage/
 # Cache
 .cache/
 *.tsbuildinfo
+
+# Cloudflare Workers
+dist/_headers
+dist/_redirects
+
+# Vercel
+.vercel/
+.vercel/output/
+
+# Docker
+*.tar

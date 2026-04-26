@@ -17,13 +17,16 @@ export const auth = betterAuth({
 
   advanced: {
     cookiePrefix: "sunity",
+    crossSubDomainCookies: {
+      enabled: true,
+    },
     defaultCookieAttributes: {
-      sameSite: "lax",
-      secure: env.nodeEnv === "production",
+      sameSite: "none",
+      secure: true,
       httpOnly: true,
       path: "/",
     },
-    useSecureCookies: env.nodeEnv === "production",
+    useSecureCookies: true,
   },
 
   socialProviders: {
