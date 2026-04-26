@@ -1,0 +1,24 @@
+# Local development variables for wrangler dev / bun run dev
+# Copy to .dev.vars and adjust values as needed
+
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/sunity-local"
+
+# Better Auth
+BETTER_AUTH_SECRET="your-secret-key-here"
+BETTER_AUTH_URL="http://localhost:3000"
+
+# Frontend URLs (comma-separated)
+FRONTEND_URLS="http://localhost:5173,https://sunity.sayyidrafee.com"
+BETTER_AUTH_EXTRA_TRUSTED_ORIGINS="https://api-sunity.vercel.app,https://api-sunity.sayyidrafee.com"
+
+# Single frontend URL fallback
+FRONTEND_URL="http://localhost:5173"
+
+# Google OAuth
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+# Environment
+NODE_ENV="development"
+PORT="3000"
