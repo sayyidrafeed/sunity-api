@@ -14,9 +14,10 @@ export async function postCreateCampaign(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const body = req.validatedBody as z.infer<typeof createCampaignSchema>;
-  const userId = req.session!.user.id;
   try {
+    const body = req.validatedBody as z.infer<typeof createCampaignSchema>;
+    const userId = req.session!.user.id;
+
     const campaign = await service.createCampaign(userId, body);
     res.status(201).json({ data: campaign });
   } catch (error) {
@@ -29,19 +30,35 @@ export async function getListCampaigns(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  const query = req.validatedQuery as z.infer<typeof listCampaignQuerySchema>;
   try {
-    const result = await service.listCampaigns(query);
+    const query = req.validatedQuery as z.infer<typeof listCampaignQuerySchema>;
+
+    const result = await service.listCampaigns({
+      page: query.page,
+      limit: query.limit ?? 12,
+      search: query.search,
+      city: query.city,
+      type: query.type,
+      status: query.status,
+    });
+
     res.json(result);
   } catch (error) {
     next(error);
   }
 }
 
-export async function getCampaignById(req: Request, res: Response, next: NextFunction) {
+export async function getCampaignByFilters(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
   try {
-    const { id } = req.validatedParams as { id: string };
-    const campaign = await service.getCampaignById(id);
+    const query = req.validatedQuery as {
+      title: string;
+      city: string;
+    };
+    const campaign = await service.getCampaignByFilters(query);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -54,9 +71,12 @@ export async function patchUpdateCampaign(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { id } = req.validatedParams as { id: string };
+    const query = req.validatedQuery as {
+      title: string;
+      city: string;
+    };
     const body = req.validatedBody as z.infer<typeof updateCampaignSchema>;
-    const campaign = await service.updateCampaign(id, body);
+    const campaign = await service.updateCampaign(query, body);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -69,9 +89,12 @@ export async function patchUpdateStatus(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { id } = req.validatedParams as { id: string };
+    const query = req.validatedQuery as {
+      title: string;
+      city: string;
+    };
     const body = req.validatedBody as z.infer<typeof updateStatusSchema>;
-    const campaign = await service.updateCampaignStatus(id, body);
+    const campaign = await service.updateCampaignStatus(query, body);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -84,9 +107,12 @@ export async function patchPublishCampaign(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { id } = req.validatedParams as { id: string };
+    const query = req.validatedQuery as {
+      title: string;
+      city: string;
+    };
     const body = req.validatedBody as z.infer<typeof publishSchema>;
-    const campaign = await service.publishCampaign(id, body);
+    const campaign = await service.publishCampaign(query, body);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -99,8 +125,11 @@ export async function deleteCampaign(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const { id } = req.validatedParams as { id: string };
-    await service.deleteCampaign(id);
+    const query = req.validatedQuery as {
+      title: string;
+      city: string;
+    };
+    await service.deleteCampaign(query);
     res.json({ success: true });
   } catch (error) {
     next(error);
