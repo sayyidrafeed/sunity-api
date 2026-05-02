@@ -2,6 +2,7 @@ import { Router } from "express";
 import { requireSession } from "../../middleware/auth.middleware.js";
 import { validateBody, validateQuery } from "../../lib/validate.js";
 import {
+  createCampaignSchema,
   updateCampaignSchema,
   updateStatusSchema,
   publishSchema,
@@ -15,6 +16,13 @@ export const campaignsRouter = Router();
 campaignsRouter.get("/", validateQuery(listCampaignQuerySchema), handlers.getListCampaigns);
 
 campaignsRouter.get("/detail", validateQuery(campaignKeySchema), handlers.getCampaignByFilters);
+
+campaignsRouter.post(
+  "/",
+  requireSession,
+  validateBody(createCampaignSchema),
+  handlers.postCreateCampaign,
+);
 
 campaignsRouter.patch(
   "/",
