@@ -8,6 +8,7 @@ import type {
   updateStatusSchema,
   publishSchema,
   listCampaignQuerySchema,
+  listCampaignAdminQuerySchema,
 } from "./campaigns.schema.js";
 import { mapCampaignToCard, mapCampaignToDetail } from "./campaigns.mappers.js";
 
@@ -53,8 +54,13 @@ export async function createCampaign(userId: string, data: z.infer<typeof create
   return campaign;
 }
 
-export async function listCampaigns(query: z.infer<typeof listCampaignQuerySchema>) {
-  const { page, limit, search, city, type, status } = query;
+/**
+ * Internal list function with conditional publishing filter
+ */
+async function listCampaignsInternal(
+  query: z.infer<typeof listCampaignQuerySchema> & { isPublishedOnly?: boolean },
+) {
+  const { page, limit, search, city, type, status, isPublishedOnly = true } = query;
   const offset = (page - 1) * limit;
   const conditions = [];
   if (search) {
@@ -65,7 +71,7 @@ export async function listCampaigns(query: z.infer<typeof listCampaignQuerySchem
   if (city) conditions.push(ilike(campaigns.city, `%${city}%`));
   if (type) conditions.push(eq(campaigns.religionType, type));
   if (status) conditions.push(eq(campaigns.status, status));
-  conditions.push(eq(campaigns.isPublished, true));
+  if (isPublishedOnly) conditions.push(eq(campaigns.isPublished, true));
   const where = conditions.length ? and(...conditions) : undefined;
   const [data, countResult] = await Promise.all([
     db.select().from(campaigns).where(where).limit(limit).offset(offset),
@@ -75,8 +81,28 @@ export async function listCampaigns(query: z.infer<typeof listCampaignQuerySchem
       .where(where),
   ]);
 
-  // Map campaigns to card DTOs with asset joins
-  const cards = await Promise.all(data.map((campaign) => mapCampaignToCard(campaign)));
+  // Fetch all cover assets for the campaigns in a single query
+  const campaignIds = data.map((c) => c.id);
+  const coverAssets = await db
+    .select({
+      campaignId: campaignAssets.campaignId,
+      assetId: assets.id,
+      storageKey: assets.storageKey,
+    })
+    .from(campaignAssets)
+    .innerJoin(assets, eq(campaignAssets.assetId, assets.id))
+    .where(
+      and(
+        sql`${campaignAssets.campaignId} = ANY(${campaignIds})`,
+        eq(campaignAssets.kind, "cover"),
+      ),
+    );
+
+  // Create a map for quick asset lookup
+  const assetMap = new Map(coverAssets.map((a) => [a.campaignId, a]));
+
+  // Map campaigns to card DTOs with preloaded assets
+  const cards = data.map((campaign) => mapCampaignToCard(campaign, assetMap.get(campaign.id)));
 
   return {
     data: cards,
@@ -84,6 +110,21 @@ export async function listCampaigns(query: z.infer<typeof listCampaignQuerySchem
     page,
     limit,
   };
+}
+
+/**
+ * List public campaigns (published only)
+ */
+export async function listCampaignsPublic(query: z.infer<typeof listCampaignQuerySchema>) {
+  return listCampaignsInternal({ ...query, isPublishedOnly: true });
+}
+
+/**
+ * List campaigns for admin with optional unpublished filter
+ */
+export async function listCampaignsAdmin(query: z.infer<typeof listCampaignAdminQuerySchema>) {
+  const { includeUnpublished, ...rest } = query;
+  return listCampaignsInternal({ ...rest, isPublishedOnly: !includeUnpublished });
 }
 
 export async function getCampaignById(id: string) {

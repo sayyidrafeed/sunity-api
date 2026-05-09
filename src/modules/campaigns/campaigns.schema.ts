@@ -37,6 +37,10 @@ export const listCampaignQuerySchema = z.object({
   status: z.enum(["Aktif", "Instalasi", "Selesai"]).optional(),
 });
 
+export const listCampaignAdminQuerySchema = listCampaignQuerySchema.extend({
+  includeUnpublished: z.coerce.boolean().default(false),
+});
+
 // Asset DTOs for responses
 const assetImageSchema = z.object({
   assetId: z.string().uuid(),
@@ -109,4 +113,20 @@ export const campaignDetailSchema = z.object({
     })
     .optional(),
   published: z.boolean(),
+});
+
+// Attach asset to campaign
+export const attachAssetSchema = z.object({
+  assetId: z.string().uuid(),
+  kind: z.enum(["cover", "gallery", "transparency", "installation", "report"]),
+  sortOrder: z.number().int().nonnegative(),
+  caption: z.string().optional(),
+});
+
+export const attachAssetResponseSchema = z.object({
+  success: z.boolean(),
+});
+
+export const successResponseSchema = z.object({
+  success: z.literal(true),
 });

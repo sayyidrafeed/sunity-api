@@ -8,7 +8,9 @@ import type {
   updateStatusSchema,
   publishSchema,
   listCampaignQuerySchema,
+  listCampaignAdminQuerySchema,
   campaignIdParamSchema,
+  attachAssetSchema,
 } from "./campaigns.schema.js";
 
 export async function postCreateCampaign(
@@ -17,8 +19,13 @@ export async function postCreateCampaign(
   next: NextFunction,
 ): Promise<void> {
   try {
+    if (!req.session?.user?.id) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     const body = req.validatedBody as z.infer<typeof createCampaignSchema>;
-    const userId = req.session!.user.id;
+    const userId = req.session.user.id;
 
     const campaign = await service.createCampaign(userId, body);
     res.status(201).json({ data: campaign });
@@ -35,13 +42,37 @@ export async function getListCampaigns(
   try {
     const query = req.validatedQuery as z.infer<typeof listCampaignQuerySchema>;
 
-    const result = await service.listCampaigns({
+    const result = await service.listCampaignsPublic({
       page: query.page,
       limit: query.limit ?? 12,
       search: query.search,
       city: query.city,
       type: query.type,
       status: query.status,
+    });
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getListCampaignsAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const query = req.validatedQuery as z.infer<typeof listCampaignAdminQuerySchema>;
+
+    const result = await service.listCampaignsAdmin({
+      page: query.page,
+      limit: query.limit ?? 12,
+      search: query.search,
+      city: query.city,
+      type: query.type,
+      status: query.status,
+      includeUnpublished: query.includeUnpublished,
     });
 
     res.json(result);
@@ -130,12 +161,7 @@ export async function postAttachAsset(
 ): Promise<void> {
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
-    const body = req.validatedBody as {
-      assetId: string;
-      kind: "cover" | "gallery" | "transparency" | "installation" | "report";
-      sortOrder: number;
-      caption?: string;
-    };
+    const body = req.validatedBody as z.infer<typeof attachAssetSchema>;
 
     await service.attachAssetToCampaign(params.id, body);
     res.status(201).json({ success: true });

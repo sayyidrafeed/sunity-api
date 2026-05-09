@@ -1,6 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { campaignAssets, assets as assetsTable } from "../../db/schema/index.js";
+import type { Campaign } from "../../db/schema/campaigns.schema.js";
 import { env } from "../../env.js";
 import type { campaignCardSchema, campaignDetailSchema } from "./campaigns.schema.js";
 import type { z } from "zod";
@@ -19,27 +20,36 @@ export function getAssetPublicUrl(storageKey: string): string {
  * Build campaign card DTO with cover image from asset join
  */
 export async function mapCampaignToCard(
-  campaign: any,
+  campaign: Campaign,
+  preloadedCoverAsset?: { assetId: string; storageKey: string } | null,
 ): Promise<z.infer<typeof campaignCardSchema>> {
-  // Fetch cover asset if it exists
+  // Use preloaded asset if provided, otherwise fetch it
   let coverImage = null;
-  const coverAssets = await db
-    .select({
-      assetId: assetsTable.id,
-      storageKey: assetsTable.storageKey,
-    })
-    .from(campaignAssets)
-    .innerJoin(assetsTable, eq(campaignAssets.assetId, assetsTable.id))
-    .where(and(eq(campaignAssets.campaignId, campaign.id), eq(campaignAssets.kind, "cover")))
-    .limit(1);
-
-  if (coverAssets.length > 0) {
-    const asset = coverAssets[0];
+  if (preloadedCoverAsset) {
     coverImage = {
-      assetId: asset.assetId,
-      publicUrl: getAssetPublicUrl(asset.storageKey),
-      storageKey: asset.storageKey,
+      assetId: preloadedCoverAsset.assetId,
+      publicUrl: getAssetPublicUrl(preloadedCoverAsset.storageKey),
+      storageKey: preloadedCoverAsset.storageKey,
     };
+  } else {
+    const coverAssets = await db
+      .select({
+        assetId: assetsTable.id,
+        storageKey: assetsTable.storageKey,
+      })
+      .from(campaignAssets)
+      .innerJoin(assetsTable, eq(campaignAssets.assetId, assetsTable.id))
+      .where(and(eq(campaignAssets.campaignId, campaign.id), eq(campaignAssets.kind, "cover")))
+      .limit(1);
+
+    if (coverAssets.length > 0) {
+      const asset = coverAssets[0];
+      coverImage = {
+        assetId: asset.assetId,
+        publicUrl: getAssetPublicUrl(asset.storageKey),
+        storageKey: asset.storageKey,
+      };
+    }
   }
 
   return {
@@ -66,7 +76,7 @@ export async function mapCampaignToCard(
  * Build campaign detail DTO with all asset images grouped by kind
  */
 export async function mapCampaignToDetail(
-  campaign: any,
+  campaign: Campaign,
 ): Promise<z.infer<typeof campaignDetailSchema>> {
   // Fetch all campaign assets with full asset data
   const campaignAssetRecords = await db
@@ -83,11 +93,25 @@ export async function mapCampaignToDetail(
     .orderBy(campaignAssets.sortOrder);
 
   // Group assets by kind
-  const imagesByKind = {
-    cover: null as any,
-    gallery: [] as any[],
-    transparency: [] as any[],
-    installation: [] as any[],
+  type ImageData = {
+    assetId: string;
+    publicUrl: string;
+    storageKey: string;
+    caption?: string;
+  };
+
+  type ImagesByKind = {
+    cover: ImageData | null;
+    gallery: ImageData[];
+    transparency: ImageData[];
+    installation: ImageData[];
+  };
+
+  const imagesByKind: ImagesByKind = {
+    cover: null,
+    gallery: [],
+    transparency: [],
+    installation: [],
   };
 
   for (const record of campaignAssetRecords) {
@@ -100,8 +124,12 @@ export async function mapCampaignToDetail(
 
     if (record.kind === "cover") {
       imagesByKind.cover = imageData;
-    } else if (record.kind in imagesByKind) {
-      imagesByKind[record.kind as keyof typeof imagesByKind].push(imageData);
+    } else if (
+      record.kind === "gallery" ||
+      record.kind === "transparency" ||
+      record.kind === "installation"
+    ) {
+      imagesByKind[record.kind].push(imageData);
     }
   }
 

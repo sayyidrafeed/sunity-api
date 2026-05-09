@@ -6,7 +6,7 @@ import { auth } from "./auth.js";
 import { env } from "./env.js";
 import { globalErrorHandler } from "./middleware/error.middleware.js";
 import { generateOpenAPIDocument, mergeOpenAPIDocuments } from "./lib/openapi.js";
-import { campaignsRouter } from "./modules/campaigns/campaigns.index.js";
+import { campaignsRouter, adminCampaignsRouter } from "./modules/campaigns/campaigns.index.js";
 import { assetsRouter } from "./modules/assets/assets.index.js";
 
 export const app = express();
@@ -44,5 +44,6 @@ app.use("/docs", apiReference({ pageTitle: "Sunity API Reference", url: "/openap
 
 app.use("/api/assets", assetsRouter);
 app.use("/api/campaigns", campaignsRouter);
+app.use("/api/admin/campaigns", adminCampaignsRouter);
 
 app.use(globalErrorHandler);
