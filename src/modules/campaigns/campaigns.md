@@ -5,7 +5,7 @@
 Base path: `/api/campaigns`
 
 This API is used for the Campaign List Page and Campaign Detail Page.  
-All detail, update, status, publish, and delete endpoints use `title + city` instead of `id`.
+All detail, update, status, publish, and delete endpoints use `id` (UUID) path parameter.
 
 ---
 
@@ -49,20 +49,19 @@ Public
 
 ### Endpoint
 
-`GET /api/campaigns/detail`
+`GET /api/campaigns/{id}`
 
 ### Access
 
 Public
 
-### Query Params
+### Path Params
 
-- `title` → campaign name
-- `city` → campaign city
+- `id` → campaign UUID
 
 ### Example
 
-`/api/campaigns/detail?title=Campaign%20A&city=Jakarta`
+`/api/campaigns/123e4567-e89b-12d3-a456-426614174000`
 
 ### Response
 
@@ -106,7 +105,9 @@ Require session
 
 ```json
 {
-  "data": {}
+  "data": {
+    "id": "123e4567-e89b-12d3-a456-426614174000"
+  }
 }
 ```
 
@@ -116,24 +117,23 @@ Require session
 
 ### Endpoint
 
-`PATCH /api/campaigns`
+`PATCH /api/campaigns/{id}`
 
 ### Access
 
 Require session
 
-### Query Params
+### Path Params
 
-- `title`
-- `city`
+- `id` → campaign UUID
 
 ### Body
 
-Same as `updateCampaignSchema`
+Same as `updateCampaignSchema` (all fields optional)
 
 ### Example
 
-`/api/campaigns?title=Campaign%20A&city=Jakarta`
+`PATCH /api/campaigns/123e4567-e89b-12d3-a456-426614174000`
 
 ### Response
 
@@ -149,16 +149,15 @@ Same as `updateCampaignSchema`
 
 ### Endpoint
 
-`PATCH /api/campaigns/status`
+`PATCH /api/campaigns/{id}/status`
 
 ### Access
 
 Require session
 
-### Query Params
+### Path Params
 
-- `title`
-- `city`
+- `id` → campaign UUID
 
 ### Body
 
@@ -182,16 +181,15 @@ Require session
 
 ### Endpoint
 
-`PATCH /api/campaigns/publish`
+`PATCH /api/campaigns/{id}/publish`
 
 ### Access
 
 Require session
 
-### Query Params
+### Path Params
 
-- `title`
-- `city`
+- `id` → campaign UUID
 
 ### Body
 
@@ -215,20 +213,19 @@ Require session
 
 ### Endpoint
 
-`DELETE /api/campaigns`
+`DELETE /api/campaigns/{id}`
 
 ### Access
 
 Require session
 
-### Query Params
+### Path Params
 
-- `title`
-- `city`
+- `id` → campaign UUID
 
 ### Example
 
-`/api/campaigns?title=Campaign%20A&city=Jakarta`
+`DELETE /api/campaigns/123e4567-e89b-12d3-a456-426614174000`
 
 ### Response
 
@@ -263,10 +260,11 @@ Required card fields:
 
 Use data from:
 
-- `GET /api/campaigns/detail`
+- `GET /api/campaigns/{id}`
 
 Required fields:
 
+- `id`
 - `title`
 - `description`
 - `coverImageUrl`

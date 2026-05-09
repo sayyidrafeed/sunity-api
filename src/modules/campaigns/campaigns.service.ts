@@ -1,6 +1,6 @@
 import { eq, ilike, and, sql, or } from "drizzle-orm";
 import { db } from "../../db/client.js";
-import { campaigns } from "../../db/schema/index.js";
+import { campaigns, campaignAssets, assets } from "../../db/schema/index.js";
 import type { z } from "zod";
 import type {
   createCampaignSchema,
@@ -9,12 +9,36 @@ import type {
   publishSchema,
   listCampaignQuerySchema,
 } from "./campaigns.schema.js";
+import { mapCampaignToCard, mapCampaignToDetail } from "./campaigns.mappers.js";
 
 export class CampaignNotFoundError extends Error {
-  constructor() {
-    super(`Campaign not found`);
+  constructor(id?: string) {
+    super(`Campaign ${id ? `(${id}) ` : ""}not found`);
     this.name = "CampaignNotFoundError";
   }
+}
+
+export class AssetNotFoundError extends Error {
+  constructor(id?: string) {
+    super(`Asset ${id ? `(${id}) ` : ""}not found`);
+    this.name = "AssetNotFoundError";
+  }
+}
+
+/**
+ * Get campaign card with cover image (for list view)
+ */
+export async function getCampaignCard(id: string) {
+  const campaign = await getCampaignById(id);
+  return mapCampaignToCard(campaign);
+}
+
+/**
+ * Get campaign detail with all images grouped by kind (for detail view)
+ */
+export async function getCampaignDetail(id: string) {
+  const campaign = await getCampaignById(id);
+  return mapCampaignToDetail(campaign);
 }
 
 export async function createCampaign(userId: string, data: z.infer<typeof createCampaignSchema>) {
@@ -50,29 +74,27 @@ export async function listCampaigns(query: z.infer<typeof listCampaignQuerySchem
       .from(campaigns)
       .where(where),
   ]);
+
+  // Map campaigns to card DTOs with asset joins
+  const cards = await Promise.all(data.map((campaign) => mapCampaignToCard(campaign)));
+
   return {
-    data,
+    data: cards,
     total: Number(countResult[0].count),
     page,
     limit,
   };
 }
 
-export async function getCampaignByFilters(query: { title: string; city: string }) {
-  const [campaign] = await db
-    .select()
-    .from(campaigns)
-    .where(and(eq(campaigns.title, query.title), eq(campaigns.city, query.city)));
-  if (!campaign) throw new CampaignNotFoundError();
+export async function getCampaignById(id: string) {
+  const [campaign] = await db.select().from(campaigns).where(eq(campaigns.id, id));
+  if (!campaign) throw new CampaignNotFoundError(id);
   return campaign;
 }
 
-export async function updateCampaign(
-  query: { title: string; city: string },
-  data: z.infer<typeof updateCampaignSchema>,
-) {
+export async function updateCampaign(id: string, data: z.infer<typeof updateCampaignSchema>) {
   const { deadline, ...rest } = data;
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     ...rest,
     updatedAt: new Date(),
   };
@@ -82,50 +104,73 @@ export async function updateCampaign(
   const [campaign] = await db
     .update(campaigns)
     .set(updateData)
-    .where(and(eq(campaigns.title, query.title), eq(campaigns.city, query.city)))
+    .where(eq(campaigns.id, id))
     .returning();
-  if (!campaign) throw new CampaignNotFoundError();
+  if (!campaign) throw new CampaignNotFoundError(id);
   return campaign;
 }
 
-export async function updateCampaignStatus(
-  query: { title: string; city: string },
-  data: z.infer<typeof updateStatusSchema>,
-) {
+export async function updateCampaignStatus(id: string, data: z.infer<typeof updateStatusSchema>) {
   const [campaign] = await db
     .update(campaigns)
     .set({
       status: data.status,
       updatedAt: new Date(),
     })
-    .where(and(eq(campaigns.title, query.title), eq(campaigns.city, query.city)))
+    .where(eq(campaigns.id, id))
     .returning();
-  if (!campaign) throw new CampaignNotFoundError();
+  if (!campaign) throw new CampaignNotFoundError(id);
   return campaign;
 }
 
-export async function publishCampaign(
-  query: { title: string; city: string },
-  data: z.infer<typeof publishSchema>,
-) {
+export async function publishCampaign(id: string, data: z.infer<typeof publishSchema>) {
   const [campaign] = await db
     .update(campaigns)
     .set({
       isPublished: data.isPublished,
       updatedAt: new Date(),
     })
-    .where(and(eq(campaigns.title, query.title), eq(campaigns.city, query.city)))
+    .where(eq(campaigns.id, id))
     .returning();
 
-  if (!campaign) throw new CampaignNotFoundError();
+  if (!campaign) throw new CampaignNotFoundError(id);
   return campaign;
 }
 
-export async function deleteCampaign(query: { title: string; city: string }) {
-  const [campaign] = await db
-    .delete(campaigns)
-    .where(and(eq(campaigns.title, query.title), eq(campaigns.city, query.city)))
-    .returning();
-  if (!campaign) throw new CampaignNotFoundError();
+export async function deleteCampaign(id: string) {
+  const [campaign] = await db.delete(campaigns).where(eq(campaigns.id, id)).returning();
+  if (!campaign) throw new CampaignNotFoundError(id);
   return campaign;
+}
+
+export async function attachAssetToCampaign(
+  campaignId: string,
+  input: {
+    assetId: string;
+    kind: "cover" | "gallery" | "transparency" | "installation" | "report";
+    sortOrder: number;
+    caption?: string;
+  },
+) {
+  // Verify campaign exists
+  const campaign = await getCampaignById(campaignId);
+  if (!campaign) throw new CampaignNotFoundError(campaignId);
+
+  // Verify asset exists
+  const [asset] = await db.select().from(assets).where(eq(assets.id, input.assetId));
+  if (!asset) throw new AssetNotFoundError(input.assetId);
+
+  // Attach asset
+  const [campaignAsset] = await db
+    .insert(campaignAssets)
+    .values({
+      campaignId,
+      assetId: input.assetId,
+      kind: input.kind,
+      sortOrder: input.sortOrder,
+      caption: input.caption,
+    })
+    .returning();
+
+  return campaignAsset;
 }
