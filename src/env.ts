@@ -1,9 +1,16 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { z } from "zod";
+
+// Load .env.test if NODE_ENV=test, otherwise load .env
+if (process.env.NODE_ENV === "test") {
+  config({ path: ".env.test" });
+} else {
+  config();
+}
 
 const commaSeparated = z
   .string()
-  .min(1)
+  .min(0)
   .transform((v) =>
     v
       .split(",")
@@ -22,6 +29,11 @@ const envSchema = z.object({
   BETTER_AUTH_EXTRA_TRUSTED_ORIGINS: commaSeparated.optional(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET_NAME: z.string().min(1).optional(),
+  R2_CUSTOM_DOMAIN: z.string().url().or(z.literal("")).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -54,6 +66,11 @@ export const env = {
   betterAuthExtraTrustedOrigins: raw.BETTER_AUTH_EXTRA_TRUSTED_ORIGINS ?? [],
   googleClientId: raw.GOOGLE_CLIENT_ID,
   googleClientSecret: raw.GOOGLE_CLIENT_SECRET,
+  r2AccountId: raw.R2_ACCOUNT_ID ?? "",
+  r2AccessKeyId: raw.R2_ACCESS_KEY_ID ?? "",
+  r2SecretAccessKey: raw.R2_SECRET_ACCESS_KEY ?? "",
+  r2BucketName: raw.R2_BUCKET_NAME ?? "",
+  r2CustomDomain: raw.R2_CUSTOM_DOMAIN,
 };
 
 export type Env = typeof env;
