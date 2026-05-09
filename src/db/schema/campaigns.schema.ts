@@ -1,6 +1,7 @@
-import { boolean, integer, numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const campaigns = pgTable("campaigns", {
+  id: uuid("id").defaultRandom().primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   targetIdr: numeric("target_idr", { precision: 15, scale: 2 }).notNull(),
