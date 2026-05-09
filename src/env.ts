@@ -1,9 +1,16 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import { z } from "zod";
+
+// Load .env.test if NODE_ENV=test, otherwise load .env
+if (process.env.NODE_ENV === "test") {
+  config({ path: ".env.test" });
+} else {
+  config();
+}
 
 const commaSeparated = z
   .string()
-  .min(1)
+  .min(0)
   .transform((v) =>
     v
       .split(",")
@@ -26,7 +33,7 @@ const envSchema = z.object({
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET_NAME: z.string().min(1).optional(),
-  R2_CUSTOM_DOMAIN: z.string().url().optional(),
+  R2_CUSTOM_DOMAIN: z.string().url().or(z.literal("")).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
