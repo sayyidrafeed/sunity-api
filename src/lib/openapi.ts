@@ -27,6 +27,14 @@ export function generateOpenAPIDocument() {
     servers: [{ url: "/api" }],
   });
 
+  cachedAppDocument.components = {
+    ...(cachedAppDocument.components ?? {}),
+    securitySchemes: {
+      ...(cachedAppDocument.components?.securitySchemes ?? {}),
+      bearerAuth: { type: "http", scheme: "bearer" },
+    },
+  };
+
   return cachedAppDocument;
 }
 

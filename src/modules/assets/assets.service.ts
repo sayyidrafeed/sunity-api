@@ -5,19 +5,18 @@ import { env } from "../../env.js";
 import type { z } from "zod";
 import type { createAssetUploadSessionSchema } from "./assets.schema.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { NotFoundError, ValidationError } from "../../lib/errors.js";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-export class AssetNotFoundError extends Error {
+export class AssetNotFoundError extends NotFoundError {
   constructor(id?: string) {
-    super(`Asset ${id ? `(${id}) ` : ""}not found`);
-    this.name = "AssetNotFoundError";
+    super("Asset not found", "ASSET_NOT_FOUND", id ? `assetId=${id}` : undefined);
   }
 }
 
-export class InvalidAssetError extends Error {
+export class InvalidAssetError extends ValidationError {
   constructor(message: string) {
-    super(message);
-    this.name = "InvalidAssetError";
+    super(message, "INVALID_ASSET");
   }
 }
 
