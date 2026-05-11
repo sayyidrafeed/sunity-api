@@ -2,6 +2,7 @@ import { eq, and } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { campaignAssets, assets as assetsTable } from "../../db/schema/index.js";
 import type { Campaign } from "../../db/schema/campaigns.schema.js";
+import type { WorshipPlace } from "../../db/schema/worship-places.schema.js";
 import { env } from "../../env.js";
 import type { campaignCardSchema, campaignDetailSchema } from "./campaigns.schema.js";
 import type { z } from "zod";
@@ -21,6 +22,7 @@ export function getAssetPublicUrl(storageKey: string): string {
  */
 export async function mapCampaignToCard(
   campaign: Campaign,
+  worshipPlace: WorshipPlace,
   preloadedCoverAsset?: { assetId: string; storageKey: string } | null,
 ): Promise<z.infer<typeof campaignCardSchema>> {
   // Use preloaded asset if provided, otherwise fetch it
@@ -55,19 +57,20 @@ export async function mapCampaignToCard(
   return {
     id: campaign.id,
     title: campaign.title,
-    city: campaign.city,
-    religionType: campaign.religionType,
+    worshipPlace: {
+      name: worshipPlace.name,
+      city: worshipPlace.city,
+      religionType: worshipPlace.religionType,
+    },
     status: campaign.status,
     targetIdr: campaign.targetIdr,
-    raisedIdr: campaign.raisedIdr || "0",
+    raisedIdr: campaign.raisedIdr || 0,
     donorCount: campaign.donorCount || 0,
     deadline: campaign.deadline.toISOString(),
-    progressPercent: campaign.raisedIdr
-      ? Math.min(
-          100,
-          Math.round((parseFloat(campaign.raisedIdr) / parseFloat(campaign.targetIdr)) * 100),
-        )
-      : 0,
+    progressPercent:
+      campaign.raisedIdr && campaign.targetIdr
+        ? Math.min(100, Math.round((campaign.raisedIdr / campaign.targetIdr) * 100))
+        : 0,
     coverImage,
   };
 }
@@ -77,6 +80,7 @@ export async function mapCampaignToCard(
  */
 export async function mapCampaignToDetail(
   campaign: Campaign,
+  worshipPlace: WorshipPlace,
 ): Promise<z.infer<typeof campaignDetailSchema>> {
   // Fetch all campaign assets with full asset data
   const campaignAssetRecords = await db
@@ -139,24 +143,30 @@ export async function mapCampaignToDetail(
     description: campaign.description,
     status: campaign.status,
     targetIdr: campaign.targetIdr,
-    raisedIdr: campaign.raisedIdr || "0",
+    raisedIdr: campaign.raisedIdr || 0,
     donorCount: campaign.donorCount || 0,
     deadline: campaign.deadline.toISOString(),
-    progressPercent: campaign.raisedIdr
-      ? Math.min(
-          100,
-          Math.round((parseFloat(campaign.raisedIdr) / parseFloat(campaign.targetIdr)) * 100),
-        )
-      : 0,
+    progressPercent:
+      campaign.raisedIdr && campaign.targetIdr
+        ? Math.min(100, Math.round((campaign.raisedIdr / campaign.targetIdr) * 100))
+        : 0,
     worshipPlace: {
-      name: campaign.worshipPlaceName,
-      city: campaign.city,
-      religionType: campaign.religionType,
+      name: worshipPlace.name,
+      city: worshipPlace.city,
+      religionType: worshipPlace.religionType,
     },
     energyImpact: {
       panelCapacityKwp: campaign.panelCapacityKwp,
       estimatedKwhAnnual: campaign.estimatedKwhAnnual ?? undefined,
       estimatedIdrSavings: campaign.estimatedIdrSavings ?? undefined,
+    },
+    impact: {
+      fundUsage: campaign.fundUsage ?? undefined,
+      energyProducedKwhMonthly: campaign.energyProducedKwhMonthly ?? undefined,
+      beneficiaries: campaign.beneficiaries ?? undefined,
+      carbonReductionKgMonthly: campaign.carbonReductionKgMonthly ?? undefined,
+      electricitySavingsIdrMonthly: campaign.electricitySavingsIdrMonthly ?? undefined,
+      impactDescription: campaign.impactDescription ?? undefined,
     },
     images: {
       cover: imagesByKind.cover,

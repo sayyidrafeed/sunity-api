@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import type { z } from "zod";
 import * as service from "./campaigns.service.js";
-import { CampaignNotFoundError, AssetNotFoundError } from "./campaigns.service.js";
+import { logActivity } from "../activity-logs/activity-logs.service.js";
 import type {
   createCampaignSchema,
   updateCampaignSchema,
@@ -49,6 +49,8 @@ export async function getListCampaigns(
       city: query.city,
       type: query.type,
       status: query.status,
+      sortBy: query.sortBy,
+      order: query.order,
     });
 
     res.json(result);
@@ -72,6 +74,8 @@ export async function getListCampaignsAdmin(
       city: query.city,
       type: query.type,
       status: query.status,
+      sortBy: query.sortBy,
+      order: query.order,
       includeUnpublished: query.includeUnpublished,
     });
 
@@ -119,6 +123,16 @@ export async function patchUpdateStatus(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const body = req.validatedBody as z.infer<typeof updateStatusSchema>;
     const campaign = await service.updateCampaignStatus(params.id, body);
+    if (req.session?.user?.id) {
+      await logActivity({
+        campaignId: campaign.id,
+        actorId: req.session.user.id,
+        action: "STATUS_CHANGED",
+        entityType: "campaign",
+        entityId: campaign.id,
+        metadata: { to: body.status },
+      });
+    }
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -134,6 +148,15 @@ export async function patchPublishCampaign(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const body = req.validatedBody as z.infer<typeof publishSchema>;
     const campaign = await service.publishCampaign(params.id, body);
+    if (req.session?.user?.id) {
+      await logActivity({
+        campaignId: campaign.id,
+        actorId: req.session.user.id,
+        action: body.isPublished ? "PUBLISHED" : "UNPUBLISHED",
+        entityType: "campaign",
+        entityId: campaign.id,
+      });
+    }
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -166,14 +189,6 @@ export async function postAttachAsset(
     await service.attachAssetToCampaign(params.id, body);
     res.status(201).json({ success: true });
   } catch (error) {
-    if (error instanceof CampaignNotFoundError) {
-      res.status(404).json({ error: "Campaign not found" });
-      return;
-    }
-    if (error instanceof AssetNotFoundError) {
-      res.status(404).json({ error: "Asset not found" });
-      return;
-    }
     next(error);
   }
 }
