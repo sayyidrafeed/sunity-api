@@ -31,6 +31,7 @@ coverage/
 # Cloudflare Workers
 dist/_headers
 dist/_redirects
+.wrangler/
 
 # Vercel
 .vercel/
