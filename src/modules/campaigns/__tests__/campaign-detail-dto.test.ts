@@ -6,9 +6,9 @@ describe("campaign detail response with assets", () => {
       id: "campaign-1",
       title: "Solar Panel Installation",
       description: "Install solar panels at local mosque",
-      status: "Aktif" as const,
-      targetIdr: "100000000",
-      raisedIdr: "25000000",
+      status: "AKTIF" as const,
+      targetIdr: 100000000,
+      raisedIdr: 25000000,
       donorCount: 120,
       progressPercent: 25,
       deadline: new Date("2025-12-31").toISOString(),
@@ -20,7 +20,15 @@ describe("campaign detail response with assets", () => {
       energyImpact: {
         panelCapacityKwp: "10.5",
         estimatedKwhAnnual: "12600",
-        estimatedIdrSavings: "18900000",
+        estimatedIdrSavings: 18900000,
+      },
+      impact: {
+        fundUsage: "Install panels",
+        energyProducedKwhMonthly: "1200",
+        beneficiaries: 250,
+        carbonReductionKgMonthly: "150.5",
+        electricitySavingsIdrMonthly: 5000000,
+        impactDescription: "Impact description",
       },
       images: {
         cover: {
