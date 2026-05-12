@@ -59,7 +59,9 @@ export async function createCampaign(userId: string, data: z.infer<typeof create
  * Internal list function with conditional publishing filter
  */
 async function listCampaignsInternal(
-  query: z.infer<typeof listCampaignQuerySchema> & { isPublishedOnly?: boolean },
+  query: z.infer<typeof listCampaignQuerySchema> & {
+    isPublishedOnly?: boolean;
+  },
 ) {
   const { page, limit, search, city, type, status, sortBy, order, isPublishedOnly = true } = query;
   const offset = (page - 1) * limit;
@@ -84,7 +86,10 @@ async function listCampaignsInternal(
       : sortBy === "targetIdr"
         ? campaigns.targetIdr
         : sortBy === "raisedProgress"
-          ? sql<number>`CASE WHEN ${campaigns.targetIdr} = 0 THEN 0 ELSE ${campaigns.raisedIdr}::float / ${campaigns.targetIdr}::float END`
+          ? // Using ::float for sorting is acceptable here since we're only ranking
+            // campaigns by progress, not performing financial calculations requiring precision.
+            // For financial calculations, consider multiplying before dividing to maintain integer precision.
+            sql<number>`CASE WHEN ${campaigns.targetIdr} = 0 THEN 0 ELSE ${campaigns.raisedIdr}::float / ${campaigns.targetIdr}::float END`
           : campaigns.createdAt;
 
   const orderByClause = order === "asc" ? orderBy : sql`${orderBy} DESC`;
@@ -153,7 +158,10 @@ export async function listCampaignsPublic(query: z.infer<typeof listCampaignQuer
  */
 export async function listCampaignsAdmin(query: z.infer<typeof listCampaignAdminQuerySchema>) {
   const { includeUnpublished, ...rest } = query;
-  return listCampaignsInternal({ ...rest, isPublishedOnly: !includeUnpublished });
+  return listCampaignsInternal({
+    ...rest,
+    isPublishedOnly: !includeUnpublished,
+  });
 }
 
 export async function getCampaignById(id: string) {
