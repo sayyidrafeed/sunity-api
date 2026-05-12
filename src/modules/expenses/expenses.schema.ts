@@ -38,6 +38,11 @@ export const campaignIdParamSchema = z.object({
   id: z.string().uuid(),
 });
 
+export const campaignIdWithExpenseIdSchema = z.object({
+  id: z.string().uuid(),
+  expenseId: z.string().uuid(),
+});
+
 export const listExpensesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).default(12),

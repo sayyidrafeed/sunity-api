@@ -4,6 +4,7 @@ import * as service from "./expenses.service.js";
 import { logActivity } from "../activity-logs/activity-logs.service.js";
 import type {
   campaignIdParamSchema,
+  campaignIdWithExpenseIdSchema,
   createExpenseSchema,
   expenseIdParamSchema,
   listExpensesQuerySchema,
@@ -63,7 +64,7 @@ export async function patchUpdateExpense(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const params = req.validatedParams as z.infer<typeof expenseIdParamSchema>;
+    const params = req.validatedParams as z.infer<typeof campaignIdWithExpenseIdSchema>;
     const body = req.validatedBody as z.infer<typeof updateExpenseSchema>;
     const expense = await service.updateExpense(params.expenseId, body);
     if (req.session?.user?.id) {
@@ -81,13 +82,13 @@ export async function patchUpdateExpense(
   }
 }
 
-export async function deleteExpense(
+export async function deleteExpenseHandler(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
   try {
-    const params = req.validatedParams as z.infer<typeof expenseIdParamSchema>;
+    const params = req.validatedParams as z.infer<typeof campaignIdWithExpenseIdSchema>;
     const expense = await service.deleteExpense(params.expenseId);
     if (req.session?.user?.id) {
       await logActivity({
