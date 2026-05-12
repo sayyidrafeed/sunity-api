@@ -3,7 +3,9 @@ import { campaigns } from "./campaigns.schema.js";
 
 export const activityLogs = pgTable("activity_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
-  campaignId: uuid("campaign_id").references(() => campaigns.id),
+  campaignId: uuid("campaign_id").references(() => campaigns.id, {
+    onDelete: "set null",
+  }),
   actorId: text("actor_id").notNull(),
   action: text("action").notNull(),
   entityType: text("entity_type"),
