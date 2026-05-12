@@ -6,7 +6,6 @@ import type {
   campaignIdParamSchema,
   campaignIdWithExpenseIdSchema,
   createExpenseSchema,
-  expenseIdParamSchema,
   listExpensesQuerySchema,
   updateExpenseSchema,
 } from "./expenses.schema.js";
