@@ -5,11 +5,14 @@ describe("campaign list response with assets", () => {
     const campaign = {
       id: "campaign-1",
       title: "Solar Panel Installation",
-      city: "Jakarta",
-      religionType: "Masjid" as const,
-      status: "Aktif" as const,
-      targetIdr: "100000000",
-      raisedIdr: "25000000",
+      worshipPlace: {
+        name: "Masjid Al-Ikhlas",
+        city: "Jakarta",
+        religionType: "Masjid" as const,
+      },
+      status: "AKTIF" as const,
+      targetIdr: 100000000,
+      raisedIdr: 25000000,
       donorCount: 120,
       progressPercent: 25,
       coverImage: {
@@ -28,7 +31,11 @@ describe("campaign list response with assets", () => {
     const campaign = {
       id: "campaign-2",
       title: "Solar Initiative",
-      city: "Bandung",
+      worshipPlace: {
+        name: "Gereja Bethlehem",
+        city: "Bandung",
+        religionType: "Gereja" as const,
+      },
       coverImage: null,
     };
 
@@ -62,7 +69,7 @@ describe("campaign list response with assets", () => {
       filters: {
         cities: ["Jakarta", "Bandung"],
         types: ["Masjid", "Gereja"],
-        statuses: ["Aktif", "Selesai"],
+        statuses: ["AKTIF", "SELESAI"],
       },
     };
 

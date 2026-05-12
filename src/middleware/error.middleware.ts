@@ -8,7 +8,12 @@ export function globalErrorHandler(
   _next: NextFunction,
 ): void {
   if (err instanceof DomainError) {
-    res.status(err.statusCode).json({ error: err.userMessage });
+    res.status(err.statusCode).json({
+      error: {
+        code: err.errorCode,
+        message: err.userMessage,
+      },
+    });
     return;
   }
 

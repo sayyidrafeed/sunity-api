@@ -30,7 +30,7 @@ Public
 
 ### Example
 
-`/api/campaigns?search=mosque&city=Jakarta&type=Masjid&status=Aktif&page=1&limit=12`
+`/api/campaigns?search=mosque&city=Jakarta&type=Masjid&status=AKTIF&page=1&limit=12`
 
 ### Response
 
@@ -89,15 +89,13 @@ Require session
 {
   "title": "Campaign A",
   "description": "Campaign description",
-  "targetIdr": "10000000",
+  "targetIdr": 10000000,
   "panelCapacityKwp": "5",
   "estimatedKwhAnnual": "1200",
-  "estimatedIdrSavings": "3000000",
+  "estimatedIdrSavings": 3000000,
   "coverImageUrl": "https://example.com/image.jpg",
   "deadline": "2026-12-31T23:59:59.000Z",
-  "worshipPlaceName": "Al-Hikmah Mosque",
-  "city": "Jakarta",
-  "religionType": "Masjid"
+  "worshipPlaceId": "123e4567-e89b-12d3-a456-426614174000"
 }
 ```
 
@@ -163,7 +161,7 @@ Require session
 
 ```json
 {
-  "status": "Aktif"
+  "status": "AKTIF"
 }
 ```
 
@@ -248,9 +246,9 @@ Use data from:
 Required card fields:
 
 - `coverImageUrl`
-- `worshipPlaceName`
-- `city`
-- `religionType`
+- `worshipPlace.name`
+- `worshipPlace.city`
+- `worshipPlace.religionType`
 - `raisedIdr`
 - `targetIdr`
 - `deadline`
@@ -268,9 +266,9 @@ Required fields:
 - `title`
 - `description`
 - `coverImageUrl`
-- `worshipPlaceName`
-- `city`
-- `religionType`
+- `worshipPlace.name`
+- `worshipPlace.city`
+- `worshipPlace.religionType`
 - `status`
 - `targetIdr`
 - `raisedIdr`

@@ -1,23 +1,32 @@
 import { z } from "zod";
 
 export const createCampaignSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().min(1),
-  targetIdr: z.string(),
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(5000),
+  targetIdr: z.number().int().positive().min(100_000).max(100_000_000_000),
   panelCapacityKwp: z.string(),
   estimatedKwhAnnual: z.string().optional(),
-  estimatedIdrSavings: z.string().optional(),
+  estimatedIdrSavings: z.number().int().positive().optional(),
   coverImageUrl: z.string().url().optional(),
-  deadline: z.string().datetime(),
-  worshipPlaceName: z.string().min(1),
-  city: z.string().min(1),
-  religionType: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]),
+  deadline: z
+    .string()
+    .datetime()
+    .refine((value) => new Date(value).getTime() > Date.now(), {
+      message: "Deadline must be in the future",
+    }),
+  worshipPlaceId: z.string().uuid(),
+  fundUsage: z.string().optional(),
+  energyProducedKwhMonthly: z.string().optional(),
+  beneficiaries: z.number().int().positive().optional(),
+  carbonReductionKgMonthly: z.string().optional(),
+  electricitySavingsIdrMonthly: z.number().int().positive().optional(),
+  impactDescription: z.string().optional(),
 });
 
 export const updateCampaignSchema = createCampaignSchema.partial();
 
 export const updateStatusSchema = z.object({
-  status: z.enum(["Aktif", "Instalasi", "Selesai"]),
+  status: z.enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED"]),
 });
 
 export const publishSchema = z.object({
@@ -34,7 +43,9 @@ export const listCampaignQuerySchema = z.object({
   search: z.string().optional(),
   city: z.string().optional(),
   type: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]).optional(),
-  status: z.enum(["Aktif", "Instalasi", "Selesai"]).optional(),
+  status: z.enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED"]).optional(),
+  sortBy: z.enum(["createdAt", "deadline", "raisedProgress", "targetIdr"]).default("createdAt"),
+  order: z.enum(["asc", "desc"]).default("desc"),
 });
 
 export const listCampaignAdminQuerySchema = listCampaignQuerySchema.extend({
@@ -56,11 +67,14 @@ const assetImageWithCaptionSchema = assetImageSchema.extend({
 export const campaignCardSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
-  city: z.string(),
-  religionType: z.string(),
+  worshipPlace: z.object({
+    name: z.string(),
+    city: z.string(),
+    religionType: z.string(),
+  }),
   status: z.string(),
-  targetIdr: z.string(),
-  raisedIdr: z.string(),
+  targetIdr: z.number(),
+  raisedIdr: z.number(),
   donorCount: z.number(),
   deadline: z.string().datetime(),
   progressPercent: z.number(),
@@ -89,8 +103,8 @@ export const campaignDetailSchema = z.object({
   title: z.string(),
   description: z.string(),
   status: z.string(),
-  targetIdr: z.string(),
-  raisedIdr: z.string(),
+  targetIdr: z.number(),
+  raisedIdr: z.number(),
   donorCount: z.number(),
   deadline: z.string().datetime(),
   progressPercent: z.number(),
@@ -102,7 +116,15 @@ export const campaignDetailSchema = z.object({
   energyImpact: z.object({
     panelCapacityKwp: z.string(),
     estimatedKwhAnnual: z.string().optional(),
-    estimatedIdrSavings: z.string().optional(),
+    estimatedIdrSavings: z.number().optional(),
+  }),
+  impact: z.object({
+    fundUsage: z.string().optional(),
+    energyProducedKwhMonthly: z.string().optional(),
+    beneficiaries: z.number().optional(),
+    carbonReductionKgMonthly: z.string().optional(),
+    electricitySavingsIdrMonthly: z.number().optional(),
+    impactDescription: z.string().optional(),
   }),
   images: z
     .object({

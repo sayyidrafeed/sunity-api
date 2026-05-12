@@ -8,6 +8,9 @@ import { globalErrorHandler } from "./middleware/error.middleware.js";
 import { generateOpenAPIDocument, mergeOpenAPIDocuments } from "./lib/openapi.js";
 import { campaignsRouter, adminCampaignsRouter } from "./modules/campaigns/campaigns.index.js";
 import { assetsRouter } from "./modules/assets/assets.index.js";
+import { worshipPlacesRouter } from "./modules/worship-places/worship-places.index.js";
+import { expensesRouter } from "./modules/expenses/expenses.index.js";
+import { activityLogsRouter } from "./modules/activity-logs/activity-logs.index.js";
 
 export const app = express();
 
@@ -45,5 +48,8 @@ app.use("/docs", apiReference({ pageTitle: "Sunity API Reference", url: "/openap
 app.use("/api/assets", assetsRouter);
 app.use("/api/campaigns", campaignsRouter);
 app.use("/api/admin/campaigns", adminCampaignsRouter);
+app.use("/api/admin/worship-places", worshipPlacesRouter);
+app.use("/api/admin", expensesRouter);
+app.use("/api/admin", activityLogsRouter);
 
 app.use(globalErrorHandler);

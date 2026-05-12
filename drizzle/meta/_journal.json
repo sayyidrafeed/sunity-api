@@ -43,6 +43,34 @@
       "when": 1778227690310,
       "tag": "0005_lonely_dracula",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1778479030052,
+      "tag": "0006_medical_scalphunter",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778479547124,
+      "tag": "0007_gigantic_wild_pack",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1778479806361,
+      "tag": "0008_closed_skullbuster",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1778480181120,
+      "tag": "0009_talented_firelord",
+      "breakpoints": true
     }
   ]
 }

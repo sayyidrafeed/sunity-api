@@ -23,6 +23,7 @@ registry.registerPath({
   path: "/admin/campaigns",
   tags: ["Admin Campaigns"],
   summary: "List all campaigns including unpublished (admin only)",
+  security: [{ bearerAuth: [] }],
   request: {
     query: listCampaignAdminQuerySchema,
   },
@@ -52,6 +53,7 @@ registry.registerPath({
   path: "/admin/campaigns/{id}/status",
   tags: ["Admin Campaigns"],
   summary: "Update campaign status (admin only)",
+  security: [{ bearerAuth: [] }],
   request: {
     params: campaignIdParamSchema,
     body: { content: { "application/json": { schema: updateStatusSchema } } },
@@ -83,6 +85,7 @@ registry.registerPath({
   path: "/admin/campaigns/{id}/publish",
   tags: ["Admin Campaigns"],
   summary: "Publish campaign (admin only)",
+  security: [{ bearerAuth: [] }],
   request: {
     params: campaignIdParamSchema,
     body: { content: { "application/json": { schema: publishSchema } } },
@@ -114,6 +117,7 @@ registry.registerPath({
   path: "/admin/campaigns/{id}",
   tags: ["Admin Campaigns"],
   summary: "Delete campaign (admin only)",
+  security: [{ bearerAuth: [] }],
   request: {
     params: campaignIdParamSchema,
   },
@@ -143,6 +147,7 @@ registry.registerPath({
   path: "/admin/campaigns/{id}/assets",
   tags: ["Admin Campaigns"],
   summary: "Attach asset to campaign (admin only)",
+  security: [{ bearerAuth: [] }],
   request: {
     params: campaignIdParamSchema,
     body: { content: { "application/json": { schema: attachAssetSchema } } },

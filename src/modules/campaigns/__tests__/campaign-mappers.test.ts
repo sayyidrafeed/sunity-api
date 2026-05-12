@@ -37,11 +37,14 @@ describe("campaign mappers - utility functions", () => {
       const card = {
         id: "campaign-1",
         title: "Solar Panel Project",
-        city: "Jakarta",
-        religionType: "Masjid",
-        status: "Aktif",
-        targetIdr: "100000000",
-        raisedIdr: "50000000",
+        worshipPlace: {
+          name: "Masjid Al-Ikhlas",
+          city: "Jakarta",
+          religionType: "Masjid",
+        },
+        status: "AKTIF",
+        targetIdr: 100000000,
+        raisedIdr: 50000000,
         donorCount: 250,
         deadline: new Date("2026-12-31T23:59:59Z").toISOString(),
         progressPercent: 50,
@@ -59,11 +62,9 @@ describe("campaign mappers - utility functions", () => {
         id: "campaign-1",
         title: "Solar Initiative",
         description: "A community solar project",
-        city: "Jakarta",
-        religionType: "Masjid",
-        status: "Aktif",
-        targetIdr: "100000000",
-        raisedIdr: "50000000",
+        status: "AKTIF",
+        targetIdr: 100000000,
+        raisedIdr: 50000000,
         donorCount: 250,
         deadline: new Date("2026-12-31T23:59:59Z").toISOString(),
         progressPercent: 50,
@@ -75,7 +76,7 @@ describe("campaign mappers - utility functions", () => {
         energyImpact: {
           panelCapacityKwp: "10",
           estimatedKwhAnnual: "15000",
-          estimatedIdrSavings: "5000000",
+          estimatedIdrSavings: 5000000,
         },
         images: {
           cover: null,
@@ -128,7 +129,7 @@ describe("campaign mappers - utility functions", () => {
       const impact1 = {
         panelCapacityKwp: "10",
         estimatedKwhAnnual: "15000",
-        estimatedIdrSavings: "5000000",
+        estimatedIdrSavings: 5000000,
       };
 
       const impact2 = {
