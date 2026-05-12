@@ -6,8 +6,8 @@ import { registry } from "../../lib/openapi.js";
 import { errorSchema } from "../../lib/schemas.js";
 import {
   campaignIdParamSchema,
+  campaignIdWithExpenseIdSchema,
   createExpenseSchema,
-  expenseIdParamSchema,
   expenseListResponseSchema,
   expenseSchema,
   listExpensesQuerySchema,
@@ -83,12 +83,12 @@ expensesRouter.post(
 
 registry.registerPath({
   method: "patch",
-  path: "/admin/expenses/{expenseId}",
+  path: "/admin/campaigns/{id}/expenses/{expenseId}",
   tags: ["Admin Expenses"],
   summary: "Update expense",
   security: [{ bearerAuth: [] }],
   request: {
-    params: expenseIdParamSchema,
+    params: campaignIdWithExpenseIdSchema,
     body: { content: { "application/json": { schema: updateExpenseSchema } } },
   },
   responses: {
@@ -104,22 +104,22 @@ registry.registerPath({
 });
 
 expensesRouter.patch(
-  "/expenses/:expenseId",
+  "/campaigns/:id/expenses/:expenseId",
   requireSession,
   requirePermission(["admin"]),
-  validateParams(expenseIdParamSchema),
+  validateParams(campaignIdWithExpenseIdSchema),
   validateBody(updateExpenseSchema),
   handlers.patchUpdateExpense,
 );
 
 registry.registerPath({
   method: "delete",
-  path: "/admin/expenses/{expenseId}",
+  path: "/admin/campaigns/{id}/expenses/{expenseId}",
   tags: ["Admin Expenses"],
   summary: "Delete expense",
   security: [{ bearerAuth: [] }],
   request: {
-    params: expenseIdParamSchema,
+    params: campaignIdWithExpenseIdSchema,
   },
   responses: {
     200: {
@@ -134,9 +134,9 @@ registry.registerPath({
 });
 
 expensesRouter.delete(
-  "/expenses/:expenseId",
+  "/campaigns/:id/expenses/:expenseId",
   requireSession,
   requirePermission(["admin"]),
-  validateParams(expenseIdParamSchema),
-  handlers.deleteExpense,
+  validateParams(campaignIdWithExpenseIdSchema),
+  handlers.deleteExpenseHandler,
 );

@@ -15,7 +15,20 @@ export class ExpenseNotFoundError extends NotFoundError {
   }
 }
 
-export class CampaignNotFoundError extends NotFoundError {
+export class ExpenseCampaignMismatchError extends Error {
+  readonly statusCode = 403 as const;
+
+  constructor(expenseId?: string, campaignId?: string) {
+    super(
+      campaignId && expenseId
+        ? `Expense ${expenseId} does not belong to campaign ${campaignId}`
+        : "Expense does not belong to this campaign",
+    );
+    this.name = "ExpenseCampaignMismatchError";
+  }
+}
+
+class CampaignNotFoundError extends NotFoundError {
   constructor(id?: string) {
     super("Campaign not found", "CAMPAIGN_NOT_FOUND", id ? `campaignId=${id}` : undefined);
   }
@@ -64,7 +77,17 @@ export async function createExpense(campaignId: string, data: z.infer<typeof cre
   return expense;
 }
 
-export async function updateExpense(expenseId: string, data: z.infer<typeof updateExpenseSchema>) {
+export async function updateExpense(
+  campaignId: string,
+  expenseId: string,
+  data: z.infer<typeof updateExpenseSchema>,
+) {
+  const [expense] = await db.select().from(expenses).where(eq(expenses.id, expenseId));
+  if (!expense) throw new ExpenseNotFoundError(expenseId);
+  if (expense.campaignId !== campaignId) {
+    throw new ExpenseCampaignMismatchError(expenseId, campaignId);
+  }
+
   const updateData: Record<string, unknown> = {
     ...data,
     updatedAt: new Date(),
@@ -72,17 +95,23 @@ export async function updateExpense(expenseId: string, data: z.infer<typeof upda
   if (data.spentAt) {
     updateData.spentAt = new Date(data.spentAt);
   }
-  const [expense] = await db
+  const [updatedExpense] = await db
     .update(expenses)
     .set(updateData)
     .where(eq(expenses.id, expenseId))
     .returning();
-  if (!expense) throw new ExpenseNotFoundError(expenseId);
-  return expense;
+  if (!updatedExpense) throw new ExpenseNotFoundError(expenseId);
+  return updatedExpense;
 }
 
-export async function deleteExpense(expenseId: string) {
-  const [expense] = await db.delete(expenses).where(eq(expenses.id, expenseId)).returning();
+export async function deleteExpense(campaignId: string, expenseId: string) {
+  const [expense] = await db.select().from(expenses).where(eq(expenses.id, expenseId));
   if (!expense) throw new ExpenseNotFoundError(expenseId);
-  return expense;
+  if (expense.campaignId !== campaignId) {
+    throw new ExpenseCampaignMismatchError(expenseId, campaignId);
+  }
+
+  const [deletedExpense] = await db.delete(expenses).where(eq(expenses.id, expenseId)).returning();
+  if (!deletedExpense) throw new ExpenseNotFoundError(expenseId);
+  return deletedExpense;
 }

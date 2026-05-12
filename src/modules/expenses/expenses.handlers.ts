@@ -29,6 +29,10 @@ export async function getListExpenses(
       },
     });
   } catch (error) {
+    if (error instanceof service.ExpenseCampaignMismatchError) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 }
@@ -54,6 +58,10 @@ export async function postCreateExpense(
     }
     res.status(201).json({ data: expense });
   } catch (error) {
+    if (error instanceof service.ExpenseCampaignMismatchError) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 }
@@ -66,7 +74,7 @@ export async function patchUpdateExpense(
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdWithExpenseIdSchema>;
     const body = req.validatedBody as z.infer<typeof updateExpenseSchema>;
-    const expense = await service.updateExpense(params.expenseId, body);
+    const expense = await service.updateExpense(params.id, params.expenseId, body);
     if (req.session?.user?.id) {
       await logActivity({
         campaignId: expense.campaignId,
@@ -78,6 +86,10 @@ export async function patchUpdateExpense(
     }
     res.json({ data: expense });
   } catch (error) {
+    if (error instanceof service.ExpenseCampaignMismatchError) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 }
@@ -89,7 +101,7 @@ export async function deleteExpenseHandler(
 ): Promise<void> {
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdWithExpenseIdSchema>;
-    const expense = await service.deleteExpense(params.expenseId);
+    const expense = await service.deleteExpense(params.id, params.expenseId);
     if (req.session?.user?.id) {
       await logActivity({
         campaignId: expense.campaignId,
@@ -101,6 +113,10 @@ export async function deleteExpenseHandler(
     }
     res.json({ success: true });
   } catch (error) {
+    if (error instanceof service.ExpenseCampaignMismatchError) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 }

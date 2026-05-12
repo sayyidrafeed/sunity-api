@@ -31,7 +31,7 @@ registry.registerPath({
 });
 
 assetsRouter.post(
-  "/upload",
+  "/assets/upload",
   validateBody(createAssetUploadSessionSchema),
   handlers.postCreateAssetUploadSession,
 );
