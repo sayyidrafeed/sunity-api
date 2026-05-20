@@ -19,13 +19,19 @@ export async function getEnergyData(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const query = req.validatedQuery as z.infer<typeof listEnergyQuerySchema>;
     const result = await service.getEnergyData(params.id, query);
+    if (!result.available || !result.tableData) {
+      res
+        .status(403)
+        .json({ error: { code: "ENERGY_DASHBOARD_NOT_AVAILABLE", message: result.message } });
+      return;
+    }
     res.json({
       summary: result.summary,
-      data: result.tableData!.data,
+      data: result.tableData.data,
       pagination: {
-        page: result.tableData!.page,
-        limit: result.tableData!.limit,
-        total: result.tableData!.total,
+        page: result.tableData.page,
+        limit: result.tableData.limit,
+        total: result.tableData.total,
       },
     });
   } catch (error) {

@@ -7,7 +7,7 @@ import type {
   listExpensesQuerySchema,
   updateExpenseSchema,
 } from "./expenses.schema.js";
-import { NotFoundError } from "../../lib/errors.js";
+import { DomainError, NotFoundError } from "../../lib/errors.js";
 
 export class ExpenseNotFoundError extends NotFoundError {
   constructor(id?: string) {
@@ -15,16 +15,15 @@ export class ExpenseNotFoundError extends NotFoundError {
   }
 }
 
-export class ExpenseCampaignMismatchError extends Error {
+export class ExpenseCampaignMismatchError extends DomainError {
   readonly statusCode = 403 as const;
-
   constructor(expenseId?: string, campaignId?: string) {
     super(
       campaignId && expenseId
         ? `Expense ${expenseId} does not belong to campaign ${campaignId}`
         : "Expense does not belong to this campaign",
+      "EXPENSE_CAMPAIGN_MISMATCH",
     );
-    this.name = "ExpenseCampaignMismatchError";
   }
 }
 

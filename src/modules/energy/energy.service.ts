@@ -104,7 +104,13 @@ export async function createEnergyRecord(
   campaignId: string,
   data: z.infer<typeof createEnergySchema>,
 ) {
-  await verifyCampaignCompleted(campaignId);
+  const isCompleted = await verifyCampaignCompleted(campaignId);
+  if (!isCompleted) {
+    throw new ConflictError(
+      "Campaign must be completed to add energy records",
+      "CAMPAIGN_NOT_COMPLETED",
+    );
+  }
   const [existing] = await db
     .select({ id: energyData.id })
     .from(energyData)
@@ -112,7 +118,6 @@ export async function createEnergyRecord(
   if (existing) {
     throw new EnergyRecordConflictError(data.month);
   }
-
   const [record] = await db
     .insert(energyData)
     .values({
@@ -130,7 +135,13 @@ export async function overwriteEnergyRecord(
   campaignId: string,
   data: z.infer<typeof createEnergySchema>,
 ) {
-  await verifyCampaignCompleted(campaignId);
+  const isCompleted = await verifyCampaignCompleted(campaignId);
+  if (!isCompleted) {
+    throw new ConflictError(
+      "Campaign must be completed to add energy records",
+      "CAMPAIGN_NOT_COMPLETED",
+    );
+  }
   const [record] = await db
     .insert(energyData)
     .values({

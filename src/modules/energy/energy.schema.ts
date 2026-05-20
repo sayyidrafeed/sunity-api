@@ -18,7 +18,7 @@ export const energySchema = energySelectSchema
   .openapi("Energy");
 
 export const createEnergySchema = z.object({
-  month: z.string().length(7),
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Must be in YYYY-MM format"),
   kwhProduced: z.number().min(0, "kWh produced must be >= 0"),
   idrSaved: z.number().int().min(0, "IDR saved must be >= 0"),
   kgCo2Reduced: z.number().min(0, "kg CO2 reduced must be >= 0"),
@@ -27,7 +27,7 @@ export const createEnergySchema = z.object({
 export const updateEnergySchema = createEnergySchema.partial();
 
 export const uploadEnergyCsvSchema = z.object({
-  file: z.any(),
+  file: z.unknown(),
 });
 
 export const energyCsvRowSchema = z.object({
