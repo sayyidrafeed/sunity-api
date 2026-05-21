@@ -6,3 +6,4 @@ export * from "./worship-places.schema.js";
 export * from "./expenses.schema.js";
 export * from "./activity-logs.schema.js";
 export * from "./energy.schema.js";
+export * from "./donations.schema.js";

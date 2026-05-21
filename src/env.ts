@@ -34,6 +34,8 @@ const envSchema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET_NAME: z.string().min(1).optional(),
   R2_CUSTOM_DOMAIN: z.string().url().or(z.literal("")).optional(),
+  MIDTRANS_SERVER_KEY: z.string().min(1),
+  MIDTRANS_CLIENT_KEY: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -71,6 +73,8 @@ export const env = {
   r2SecretAccessKey: raw.R2_SECRET_ACCESS_KEY ?? "",
   r2BucketName: raw.R2_BUCKET_NAME ?? "",
   r2CustomDomain: raw.R2_CUSTOM_DOMAIN,
+  midtransServerKey: raw.MIDTRANS_SERVER_KEY,
+  midtransClientKey: raw.MIDTRANS_CLIENT_KEY,
 };
 
 export type Env = typeof env;
