@@ -3,8 +3,11 @@ import { requirePermission, requireSession } from "../../middleware/auth.middlew
 import { validateBody } from "../../lib/validate.js";
 import { registry } from "../../lib/openapi.js";
 import { errorSchema } from "../../lib/schemas.js";
-import { createAssetUploadSessionSchema, assetUploadSessionResponseSchema } from "../assets/assets.schema.js";
-import * as assetHandlers from "../assets/assets.handlers.js";
+import {
+  adminAssetUploadSessionResponseSchema,
+  createAdminAssetUploadSessionSchema,
+} from "./admin-uploads.schema.js";
+import { postCreateAdminAssetUploadSession } from "./admin-uploads.handlers.js";
 
 export const adminUploadsRouter = Router();
 
@@ -15,12 +18,12 @@ registry.registerPath({
   summary: "Create presigned upload session (admin)",
   security: [{ bearerAuth: [] }],
   request: {
-    body: { content: { "application/json": { schema: createAssetUploadSessionSchema } } },
+    body: { content: { "application/json": { schema: createAdminAssetUploadSessionSchema } } },
   },
   responses: {
     201: {
       description: "Upload session created",
-      content: { "application/json": { schema: assetUploadSessionResponseSchema } },
+      content: { "application/json": { schema: adminAssetUploadSessionResponseSchema } },
     },
     400: {
       description: "Invalid asset input",
@@ -33,8 +36,6 @@ adminUploadsRouter.post(
   "/uploads/presign",
   requireSession,
   requirePermission(["admin"]),
-  validateBody(createAssetUploadSessionSchema),
-  assetHandlers.postCreateAssetUploadSession,
+  validateBody(createAdminAssetUploadSessionSchema),
+  postCreateAdminAssetUploadSession,
 );
-
-export default adminUploadsRouter;

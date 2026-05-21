@@ -13,6 +13,7 @@ import {
   attachAssetResponseSchema,
   successResponseSchema,
   createCampaignSchema,
+  campaignCreatedResponseSchema,
 } from "./campaigns.schema.js";
 import * as handlers from "./campaigns.handlers.js";
 
@@ -61,7 +62,7 @@ registry.registerPath({
   responses: {
     201: {
       description: "Campaign created",
-      content: { "application/json": { schema: campaignIdParamSchema } },
+      content: { "application/json": { schema: campaignCreatedResponseSchema } },
     },
     401: {
       description: "Unauthorized",
