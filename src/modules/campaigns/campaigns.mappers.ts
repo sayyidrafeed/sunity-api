@@ -61,6 +61,7 @@ export async function mapCampaignToCard(
       name: worshipPlace.name,
       city: worshipPlace.city,
       religionType: worshipPlace.religionType,
+      address: worshipPlace.address,
     },
     status: campaign.status,
     targetIdr: campaign.targetIdr,
@@ -154,6 +155,7 @@ export async function mapCampaignToDetail(
       name: worshipPlace.name,
       city: worshipPlace.city,
       religionType: worshipPlace.religionType,
+      address: worshipPlace.address,
     },
     energyImpact: {
       panelCapacityKwp: campaign.panelCapacityKwp,

@@ -12,6 +12,7 @@ import { worshipPlacesRouter } from "./modules/worship-places/worship-places.ind
 import { expensesRouter } from "./modules/expenses/expenses.index.js";
 import { activityLogsRouter } from "./modules/activity-logs/activity-logs.index.js";
 import { adminUploadsRouter } from "./modules/admin-uploads/admin-uploads.index.js";
+import { energyRouter } from "./modules/energy/energy.index.js";
 
 export const app = express();
 
@@ -53,5 +54,6 @@ app.use("/api/admin/worship-places", worshipPlacesRouter);
 app.use("/api/admin", expensesRouter);
 app.use("/api/admin", activityLogsRouter);
 app.use("/api/admin", adminUploadsRouter);
+app.use("/api/admin/energy", energyRouter);
 
 app.use(globalErrorHandler);
