@@ -43,7 +43,10 @@ export const listCampaignQuerySchema = z.object({
   search: z.string().optional(),
   city: z.string().optional(),
   type: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]).optional(),
-  status: z.enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED"]).optional(),
+  status: z
+    .enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED", "Completed"])
+    .transform((val) => (val === "Completed" ? "SELESAI" : val))
+    .optional(),
   sortBy: z.enum(["createdAt", "deadline", "raisedProgress", "targetIdr"]).default("createdAt"),
   order: z.enum(["asc", "desc"]).default("desc"),
 });
@@ -71,6 +74,7 @@ export const campaignCardSchema = z.object({
     name: z.string(),
     city: z.string(),
     religionType: z.string(),
+    address: z.string().optional(),
   }),
   status: z.string(),
   targetIdr: z.number(),
@@ -112,6 +116,7 @@ export const campaignDetailSchema = z.object({
     name: z.string(),
     city: z.string(),
     religionType: z.string(),
+    address: z.string().optional(),
   }),
   energyImpact: z.object({
     panelCapacityKwp: z.string(),
@@ -135,6 +140,18 @@ export const campaignDetailSchema = z.object({
     })
     .optional(),
   published: z.boolean(),
+  energyDashboard: z
+    .object({
+      totalEnergyKwh: z.string(),
+      averageEnergyPerDayKwh: z.string(),
+      sinceDate: z.string(),
+      progressPercent: z.number(),
+      carbonReductionTon: z.string(),
+      carbonReductionMomPercent: z.number(),
+      costSavingsIdrMonthly: z.string(),
+      equivalentHousesPerYear: z.number(),
+    })
+    .optional(),
 });
 
 // Attach asset to campaign
