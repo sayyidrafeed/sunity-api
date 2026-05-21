@@ -4,7 +4,11 @@ import { campaignAssets, assets as assetsTable } from "../../db/schema/index.js"
 import type { Campaign } from "../../db/schema/campaigns.schema.js";
 import type { WorshipPlace } from "../../db/schema/worship-places.schema.js";
 import { env } from "../../env.js";
-import type { campaignCardSchema, campaignDetailSchema } from "./campaigns.schema.js";
+import type {
+  campaignCardSchema,
+  campaignDetailSchema,
+  campaignSummarySchema,
+} from "./campaigns.schema.js";
 import type { z } from "zod";
 
 /**
@@ -177,5 +181,20 @@ export async function mapCampaignToDetail(
       installation: imagesByKind.installation,
     },
     published: campaign.isPublished,
+  };
+}
+
+/**
+ * Build campaign summary DTO for quick layout binding
+ */
+export async function mapCampaignToSummary(
+  campaign: Campaign,
+): Promise<z.infer<typeof campaignSummarySchema>> {
+  return {
+    id: campaign.id,
+    title: campaign.title,
+    targetIdr: Number(campaign.targetIdr),
+    raisedIdr: Number(campaign.raisedIdr),
+    donorCount: campaign.donorCount || 0,
   };
 }

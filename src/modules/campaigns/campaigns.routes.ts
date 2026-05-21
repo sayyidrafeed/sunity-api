@@ -10,6 +10,7 @@ import {
   campaignIdParamSchema,
   campaignListResponseSchema,
   campaignDetailSchema,
+  campaignSummarySchema,
 } from "./campaigns.schema.js";
 import * as handlers from "./campaigns.handlers.js";
 
@@ -33,6 +34,60 @@ registry.registerPath({
 });
 
 campaignsRouter.get("/", validateQuery(listCampaignQuerySchema), handlers.getListCampaigns);
+
+// GET /api/campaigns/:id/summary - Get campaign summary
+registry.registerPath({
+  method: "get",
+  path: "/campaigns/{id}/summary",
+  tags: ["Campaigns"],
+  summary: "Get campaign summary",
+  request: {
+    params: campaignIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Campaign summary",
+      content: { "application/json": { schema: campaignSummarySchema } },
+    },
+    404: {
+      description: "Campaign not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+});
+
+campaignsRouter.get(
+  "/:id/summary",
+  validateParams(campaignIdParamSchema),
+  handlers.getCampaignSummary,
+);
+
+// GET /api/campaigns/:id/details - Get full campaign details for detail page view
+registry.registerPath({
+  method: "get",
+  path: "/campaigns/{id}/details",
+  tags: ["Campaigns"],
+  summary: "Get full campaign details for detail page view",
+  request: {
+    params: campaignIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Full campaign details layout architecture",
+      content: { "application/json": { schema: campaignDetailSchema } },
+    },
+    404: {
+      description: "Campaign not found",
+      content: { "application/json": { schema: errorSchema } }, // sesuaikan dengan nama schema error proyekmu
+    },
+  },
+});
+
+campaignsRouter.get(
+  "/:id/details",
+  validateParams(campaignIdParamSchema),
+  handlers.getCampaignFullDetails,
+);
 
 // GET /api/campaigns/:id - Get campaign by ID
 registry.registerPath({

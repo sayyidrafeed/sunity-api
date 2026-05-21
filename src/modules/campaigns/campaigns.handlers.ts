@@ -192,3 +192,31 @@ export async function postAttachAsset(
     next(error);
   }
 }
+
+export async function getCampaignSummary(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
+    const summary = await service.getCampaignSummary(params.id);
+    res.json({ data: summary });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCampaignFullDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
+    const campaign = await service.getCampaignDetail(params.id);
+    res.json({ data: campaign });
+  } catch (error) {
+    next(error);
+  }
+}
