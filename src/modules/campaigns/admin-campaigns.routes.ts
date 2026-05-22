@@ -12,6 +12,8 @@ import {
   attachAssetSchema,
   attachAssetResponseSchema,
   successResponseSchema,
+  createCampaignSchema,
+  campaignCreatedResponseSchema,
 } from "./campaigns.schema.js";
 import * as handlers from "./campaigns.handlers.js";
 
@@ -45,6 +47,36 @@ adminCampaignsRouter.get(
   requirePermission(["admin"]),
   validateQuery(listCampaignAdminQuerySchema),
   handlers.getListCampaignsAdmin,
+);
+
+// POST /api/admin/campaigns - Create campaign (admin)
+registry.registerPath({
+  method: "post",
+  path: "/admin/campaigns",
+  tags: ["Admin Campaigns"],
+  summary: "Create a new campaign (admin)",
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: { content: { "application/json": { schema: createCampaignSchema } } },
+  },
+  responses: {
+    201: {
+      description: "Campaign created",
+      content: { "application/json": { schema: campaignCreatedResponseSchema } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+});
+
+adminCampaignsRouter.post(
+  "/",
+  requireSession,
+  requirePermission(["admin"]),
+  validateBody(createCampaignSchema),
+  handlers.postCreateCampaign,
 );
 
 // PATCH /api/admin/campaigns/:id/status - Update campaign status

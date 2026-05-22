@@ -1,4 +1,6 @@
+import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
+import { campaigns } from "../../db/schema/index.js";
 
 export const createCampaignSchema = z.object({
   title: z.string().min(1).max(200),
@@ -152,6 +154,12 @@ export const campaignDetailSchema = z.object({
       equivalentHousesPerYear: z.number(),
     })
     .optional(),
+});
+
+const campaignDbSchema = createSelectSchema(campaigns).openapi("CampaignDb");
+
+export const campaignCreatedResponseSchema = z.object({
+  data: campaignDbSchema,
 });
 
 // Attach asset to campaign
