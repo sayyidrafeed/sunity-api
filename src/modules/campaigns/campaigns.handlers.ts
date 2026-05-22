@@ -85,6 +85,10 @@ export async function getListCampaignsAdmin(
   }
 }
 
+async function getCampaignDetailInternal(id: string) {
+  return await service.getCampaignDetail(id);
+}
+
 export async function getCampaignById(
   req: Request,
   res: Response,
@@ -92,7 +96,7 @@ export async function getCampaignById(
 ): Promise<void> {
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
-    const campaign = await service.getCampaignDetail(params.id);
+    const campaign = await getCampaignDetailInternal(params.id);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -214,7 +218,7 @@ export async function getCampaignFullDetails(
 ): Promise<void> {
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
-    const campaign = await service.getCampaignDetail(params.id);
+    const campaign = await getCampaignDetailInternal(params.id);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
