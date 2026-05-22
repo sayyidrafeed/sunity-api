@@ -5,6 +5,7 @@ import type {
   campaignIdParamSchema,
   createDonationSchema,
   listDonationsQuerySchema,
+  midtransWebhookPayloadSchema,
 } from "./donations.schema.js";
 
 export async function postInitiateDonation(
@@ -60,14 +61,16 @@ export async function postMidtransWebhookHandler(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const notification = req.body as Record<string, any>;
-    const orderId = notification.order_id as string;
-    const transStatus = notification.transaction_status as string;
+    const body = req.validatedBody as z.infer<typeof midtransWebhookPayloadSchema>;
 
-    await service.processMidtransWebhook(orderId, transStatus);
+    await service.processMidtransWebhook(body);
 
     res.json({ success: true });
   } catch (error) {
+    if (error instanceof service.InvalidSignatureError) {
+      res.status(403).json({ error: error.message });
+      return;
+    }
     if (error instanceof service.DonationNotFoundError) {
       res.status(404).json({ error: error.message });
       return;

@@ -9,9 +9,9 @@ import {
   listDonationsQuerySchema,
   donationListResponseSchema,
   successResponseSchema,
+  midtransWebhookPayloadSchema,
 } from "./donations.schema.js";
 import * as handlers from "./donations.handlers.js";
-import z from "zod";
 
 export const donationsRouter = Router();
 
@@ -79,7 +79,7 @@ registry.registerPath({
   request: {
     body: {
       content: {
-        "application/json": { schema: z.object({}).passthrough() },
+        "application/json": { schema: midtransWebhookPayloadSchema },
       },
     },
   },
@@ -88,6 +88,10 @@ registry.registerPath({
       description: "Webhook processed successfully",
       content: { "application/json": { schema: successResponseSchema } },
     },
+    403: {
+      description: "Invalid signature",
+      content: { "application/json": { schema: errorSchema } },
+    },
     404: {
       description: "Order record not found",
       content: { "application/json": { schema: errorSchema } },
@@ -95,4 +99,8 @@ registry.registerPath({
   },
 });
 
-donationsRouter.post("/webhook/midtrans", handlers.postMidtransWebhookHandler);
+donationsRouter.post(
+  "/webhook/midtrans",
+  validateBody(midtransWebhookPayloadSchema),
+  handlers.postMidtransWebhookHandler,
+);

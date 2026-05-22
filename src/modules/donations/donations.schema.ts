@@ -54,3 +54,13 @@ export const donationListResponseSchema = z.object({
 export const successResponseSchema = z.object({
   success: z.boolean(),
 });
+
+export const midtransWebhookPayloadSchema = z
+  .object({
+    order_id: z.string(),
+    status_code: z.string(),
+    gross_amount: z.string(),
+    signature_key: z.string(),
+    transaction_status: z.string(),
+  })
+  .passthrough();
