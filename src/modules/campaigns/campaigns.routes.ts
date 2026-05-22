@@ -10,7 +10,7 @@ import {
   campaignIdParamSchema,
   campaignListResponseSchema,
   campaignDetailSchema,
-  campaignSummarySchema,
+  campaignSummaryResponseSchema,
 } from "./campaigns.schema.js";
 import * as handlers from "./campaigns.handlers.js";
 
@@ -47,7 +47,7 @@ registry.registerPath({
   responses: {
     200: {
       description: "Campaign summary",
-      content: { "application/json": { schema: campaignSummarySchema } },
+      content: { "application/json": { schema: campaignSummaryResponseSchema } },
     },
     404: {
       description: "Campaign not found",

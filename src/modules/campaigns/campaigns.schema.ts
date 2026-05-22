@@ -177,3 +177,7 @@ export const campaignSummarySchema = z.object({
   raisedIdr: z.number(),
   donorCount: z.number(),
 });
+
+export const campaignSummaryResponseSchema = z.object({
+  data: campaignSummarySchema,
+});
