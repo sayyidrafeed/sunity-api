@@ -43,6 +43,7 @@
     "drizzle-orm": "^0.45.2",
     "drizzle-zod": "^0.8.3",
     "express": "^5.2.1",
+    "midtrans-client": "^1.4.3",
     "postgres": "^3.4.7",
     "zod": "^4.3.6"
   },
@@ -50,6 +51,7 @@
     "@cloudflare/workers-types": "^4.20250409.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/midtrans-client": "^1.4.0",
     "@types/node": "^25.5.0",
     "@typescript/native-preview": "^7.0.0-dev.20260207.1",
     "drizzle-kit": "^0.31.10",
