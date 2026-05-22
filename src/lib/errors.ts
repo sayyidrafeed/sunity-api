@@ -1,11 +1,13 @@
 export abstract class DomainError extends Error {
   abstract readonly statusCode: number;
   readonly userMessage: string;
+  readonly errorCode: string;
 
-  constructor(userMessage: string, internalDetail?: string) {
+  constructor(userMessage: string, errorCode: string, internalDetail?: string) {
     super(internalDetail ? `${userMessage}: ${internalDetail}` : userMessage);
     this.name = this.constructor.name;
     this.userMessage = userMessage;
+    this.errorCode = errorCode;
   }
 }
 

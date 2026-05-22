@@ -2,13 +2,13 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { openAPI } from "better-auth/plugins";
 import { db } from "./db/client.js";
-import { env } from "./config/env.js";
+import { env } from "./env.js";
 import { users, sessions, accounts, verification } from "./db/schema/index.js";
 
 export const auth = betterAuth({
   baseURL: env.betterAuthUrl,
   secret: env.betterAuthSecret,
-  trustedOrigins: [env.frontendUrl, env.betterAuthUrl],
+  trustedOrigins: [...env.frontendUrls, env.betterAuthUrl, ...env.betterAuthExtraTrustedOrigins],
 
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -22,13 +22,16 @@ export const auth = betterAuth({
 
   advanced: {
     cookiePrefix: "sunity",
+    crossSubDomainCookies: {
+      enabled: true,
+    },
     defaultCookieAttributes: {
-      sameSite: "lax",
-      secure: env.nodeEnv === "production",
+      sameSite: "none",
+      secure: true,
       httpOnly: true,
       path: "/",
     },
-    useSecureCookies: env.nodeEnv === "production",
+    useSecureCookies: true,
   },
 
   socialProviders: {

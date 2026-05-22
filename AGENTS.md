@@ -19,7 +19,7 @@ and human contributors MUST follow these instructions.
 | OpenAPI spec      | `@asteasolutions/zod-to-openapi` + Better Auth `openAPI()` plugin              |
 | API docs UI       | `@scalar/express-api-reference` (served at `/docs`, backed by `/openapi.json`) |
 | FE SDK generation | `@hey-api/openapi-ts` — run from the **frontend repo** (not installed here)    |
-| Environment       | `dotenv` validated at startup in `src/env.ts`                                  |
+| Environment       | `dotenv` + Zod validated at startup in `src/env.ts`                            |
 | Formatter         | `oxfmt` (80-char print width)                                                  |
 | Linter            | `oxlint` (strict rules)                                                        |
 | Type checker      | `tsgo --noEmit`                                                                |
@@ -688,8 +688,8 @@ const url = process.env.DATABASE_URL;
 | `BETTER_AUTH_SECRET`   | Secret used to sign sessions                                                                   |
 | `FRONTEND_URL`         | Frontend origin URL — added to Better Auth `trustedOrigins`                                    |
 | `NODE_ENV`             | `"development" \| "production" \| "test"` — controls secure cookies and other runtime behavior |
-| `GOOGLE_CLIENT_ID`     | Google OAuth client ID (optional — provider skipped if absent)                                 |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (optional — provider skipped if absent)                             |
+| `GOOGLE_CLIENT_ID`     | Google OAuth client ID                                                                         |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret                                                                     |
 
 ---
 
