@@ -85,6 +85,10 @@ export async function getListCampaignsAdmin(
   }
 }
 
+async function getCampaignDetailInternal(id: string) {
+  return await service.getCampaignDetail(id);
+}
+
 export async function getCampaignById(
   req: Request,
   res: Response,
@@ -92,7 +96,7 @@ export async function getCampaignById(
 ): Promise<void> {
   try {
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
-    const campaign = await service.getCampaignDetail(params.id);
+    const campaign = await getCampaignDetailInternal(params.id);
     res.json({ data: campaign });
   } catch (error) {
     next(error);
@@ -188,6 +192,34 @@ export async function postAttachAsset(
 
     await service.attachAssetToCampaign(params.id, body);
     res.status(201).json({ success: true });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCampaignSummary(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
+    const summary = await service.getCampaignSummary(params.id);
+    res.json({ data: summary });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getCampaignFullDetails(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
+    const campaign = await getCampaignDetailInternal(params.id);
+    res.json({ data: campaign });
   } catch (error) {
     next(error);
   }

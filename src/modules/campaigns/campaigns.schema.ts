@@ -177,3 +177,15 @@ export const attachAssetResponseSchema = z.object({
 export const successResponseSchema = z.object({
   success: z.literal(true),
 });
+
+export const campaignSummarySchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  targetIdr: z.number(),
+  raisedIdr: z.number(),
+  donorCount: z.number(),
+});
+
+export const campaignSummaryResponseSchema = z.object({
+  data: campaignSummarySchema,
+});

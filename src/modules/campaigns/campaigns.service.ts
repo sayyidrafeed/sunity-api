@@ -10,7 +10,11 @@ import type {
   listCampaignQuerySchema,
   listCampaignAdminQuerySchema,
 } from "./campaigns.schema.js";
-import { mapCampaignToCard, mapCampaignToDetail } from "./campaigns.mappers.js";
+import {
+  mapCampaignToCard,
+  mapCampaignToDetail,
+  mapCampaignToSummary,
+} from "./campaigns.mappers.js";
 import { NotFoundError } from "../../lib/errors.js";
 
 export class CampaignNotFoundError extends NotFoundError {
@@ -259,4 +263,10 @@ export async function attachAssetToCampaign(
     .returning();
 
   return campaignAsset;
+}
+
+// Get simple campaign summary data
+export async function getCampaignSummary(id: string) {
+  const campaign = await getCampaignById(id);
+  return mapCampaignToSummary(campaign.campaign);
 }
