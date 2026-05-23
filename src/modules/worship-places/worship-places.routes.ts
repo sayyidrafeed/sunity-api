@@ -35,7 +35,7 @@ registry.registerPath({
 worshipPlacesRouter.get(
   "/",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateQuery(listWorshipPlacesQuerySchema),
   handlers.getListWorshipPlaces,
 );
@@ -60,7 +60,7 @@ registry.registerPath({
 worshipPlacesRouter.post(
   "/",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateBody(createWorshipPlaceSchema),
   handlers.postCreateWorshipPlace,
 );
@@ -89,7 +89,7 @@ registry.registerPath({
 worshipPlacesRouter.get(
   "/:id",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(worshipPlaceIdParamSchema),
   handlers.getWorshipPlaceById,
 );
@@ -119,7 +119,7 @@ registry.registerPath({
 worshipPlacesRouter.patch(
   "/:id",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(worshipPlaceIdParamSchema),
   validateBody(updateWorshipPlaceSchema),
   handlers.patchUpdateWorshipPlace,
