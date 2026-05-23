@@ -46,6 +46,14 @@ export const auth = betterAuth({
   account: {
     storeStateStrategy: "cookie",
     storeAccountCookie: true,
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+    },
+  },
+
+  onAPIError: {
+    errorURL: `${env.frontendUrls[0]}/admin/login`,
   },
 
   session: {
