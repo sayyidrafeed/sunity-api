@@ -26,7 +26,7 @@ export function createRequireSession(getSession: SessionGetter = defaultGetSessi
 
 export const requireSession = createRequireSession();
 
-export function requirePermission(resource: string, actions: string[]) {
+export function requirePermission(_resource: string, _actions: string[]) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const userRole = (req.session?.user as { role?: string } | undefined)?.role ?? "";
     const userRoles = userRole.split(",").map((r) => r.trim().toLowerCase());
