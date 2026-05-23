@@ -23,6 +23,7 @@
     "start": "node dist/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "bun --env-file=.env src/scripts/index.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint . --fix",
     "format": "oxfmt --write",
@@ -44,6 +45,7 @@
     "drizzle-zod": "^0.8.3",
     "express": "^5.2.1",
     "midtrans-client": "^1.4.3",
+    "pg": "^8.21.0",
     "postgres": "^3.4.7",
     "zod": "^4.3.6"
   },
@@ -53,6 +55,7 @@
     "@types/express": "^5.0.6",
     "@types/midtrans-client": "^1.4.0",
     "@types/node": "^25.5.0",
+    "@types/pg": "^8.20.0",
     "@typescript/native-preview": "^7.0.0-dev.20260207.1",
     "drizzle-kit": "^0.31.10",
     "husky": "^9.1.7",

@@ -15,3 +15,6 @@ export const donations = pgTable("donations", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type Donation = typeof donations.$inferSelect;
+export type NewDonation = typeof donations.$inferInsert;
