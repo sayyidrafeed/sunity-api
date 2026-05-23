@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import type { z } from "zod";
 import * as service from "./energy.service.js";
 import { logActivity } from "../activity-logs/activity-logs.service.js";
+import { NotFoundError, ConflictError } from "../../lib/errors.js";
 import type {
   campaignIdParamSchema,
   energyMonthParamSchema,
@@ -10,6 +11,25 @@ import type {
   updateEnergySchema,
   bulkUploadEnergyBodySchema,
 } from "./energy.schema.js";
+
+async function logEnergyActivity(
+  campaignId: string,
+  action: string,
+  entityId: string,
+  userId?: string,
+  metadata?: Record<string, unknown>,
+): Promise<void> {
+  if (userId) {
+    await logActivity({
+      campaignId,
+      actorId: userId,
+      action,
+      entityType: "energy",
+      entityId,
+      metadata,
+    });
+  }
+}
 
 export async function getEnergyData(
   req: Request,
@@ -53,20 +73,22 @@ export async function postCreateEnergy(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const body = req.validatedBody as z.infer<typeof createEnergySchema>;
     const record = await service.createEnergyRecord(params.id, body);
-    if (req.session?.user?.id) {
-      await logActivity({
-        campaignId: record.campaignId,
-        actorId: req.session.user.id,
-        action: "ENERGY_RECORD_CREATED",
-        entityType: "energy",
-        entityId: record.id,
-        metadata: { month: record.month, kwhProduced: record.kwhProduced },
-      });
-    }
+    await logEnergyActivity(params.id, "ENERGY_RECORD_CREATED", record.id, req.session?.user?.id, {
+      month: record.month,
+      kwhProduced: record.kwhProduced,
+    });
     res.status(201).json({ data: record });
   } catch (error) {
     if (error instanceof service.EnergyRecordConflictError) {
       res.status(409).json({ error: error.message });
+      return;
+    }
+    if (error instanceof ConflictError) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    if (error instanceof NotFoundError) {
+      res.status(404).json({ error: error.message });
       return;
     }
     next(error);
@@ -82,19 +104,23 @@ export async function putOverwriteEnergy(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const body = req.validatedBody as z.infer<typeof createEnergySchema>;
     const record = await service.overwriteEnergyRecord(params.id, body);
-    if (req.session?.user?.id) {
-      await logActivity({
-        campaignId: record.campaignId,
-        actorId: req.session.user.id,
-        action: "ENERGY_RECORD_OVERWRITTEN",
-        entityType: "energy",
-        entityId: record.id,
-        metadata: { month: record.month, kwhProduced: record.kwhProduced },
-      });
-    }
+    await logEnergyActivity(
+      params.id,
+      "ENERGY_RECORD_OVERWRITTEN",
+      record.id,
+      req.session?.user?.id,
+      {
+        month: record.month,
+        kwhProduced: record.kwhProduced,
+      },
+    );
     res.json({ data: record });
   } catch (error) {
-    if (error instanceof service.EnergyRecordNotFoundError) {
+    if (error instanceof ConflictError) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    if (error instanceof NotFoundError) {
       res.status(404).json({ error: error.message });
       return;
     }
@@ -111,16 +137,9 @@ export async function patchUpdateEnergy(
     const params = req.validatedParams as z.infer<typeof energyMonthParamSchema>;
     const body = req.validatedBody as z.infer<typeof updateEnergySchema>;
     const record = await service.updateEnergyRecord(params.id, params.month, body);
-    if (req.session?.user?.id) {
-      await logActivity({
-        campaignId: record.campaignId,
-        actorId: req.session.user.id,
-        action: "ENERGY_RECORD_UPDATED",
-        entityType: "energy",
-        entityId: record.id,
-        metadata: { month: record.month },
-      });
-    }
+    await logEnergyActivity(params.id, "ENERGY_RECORD_UPDATED", record.id, req.session?.user?.id, {
+      month: record.month,
+    });
     res.json({ data: record });
   } catch (error) {
     if (error instanceof service.EnergyRecordNotFoundError) {
@@ -139,16 +158,9 @@ export async function deleteEnergyHandler(
   try {
     const params = req.validatedParams as z.infer<typeof energyMonthParamSchema>;
     const record = await service.deleteEnergyRecord(params.id, params.month);
-    if (req.session?.user?.id) {
-      await logActivity({
-        campaignId: record.campaignId,
-        actorId: req.session.user.id,
-        action: "ENERGY_RECORD_DELETED",
-        entityType: "energy",
-        entityId: record.id,
-        metadata: { month: record.month },
-      });
-    }
+    await logEnergyActivity(params.id, "ENERGY_RECORD_DELETED", record.id, req.session?.user?.id, {
+      month: record.month,
+    });
     res.json({ success: true });
   } catch (error) {
     if (error instanceof service.EnergyRecordNotFoundError) {
@@ -168,21 +180,27 @@ export async function postBulkUploadEnergy(
     const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
     const body = req.validatedBody as z.infer<typeof bulkUploadEnergyBodySchema>;
     const result = await service.bulkUploadEnergyRecords(params.id, body.records);
-    if (req.session?.user?.id) {
-      await logActivity({
-        campaignId: params.id,
-        actorId: req.session.user.id,
-        action: "ENERGY_RECORD_BULK_UPLOADED",
-        entityType: "energy",
-        metadata: {
-          count: result.data.length,
-          created: result.created,
-          updated: result.updated,
-        },
-      });
-    }
+    await logEnergyActivity(
+      params.id,
+      "ENERGY_RECORD_BULK_UPLOADED",
+      params.id,
+      req.session?.user?.id,
+      {
+        count: result.data.length,
+        created: result.created,
+        updated: result.updated,
+      },
+    );
     res.status(201).json(result);
   } catch (error) {
+    if (error instanceof ConflictError) {
+      res.status(409).json({ error: error.message });
+      return;
+    }
+    if (error instanceof NotFoundError) {
+      res.status(404).json({ error: error.message });
+      return;
+    }
     next(error);
   }
 }
