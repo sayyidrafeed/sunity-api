@@ -97,13 +97,13 @@ export async function getAdminDashboard(campaignId: string, drizzleDb = db) {
     const monthIndex = now.getUTCMonth();
     const daysInCurrentMonth = new Date(Date.UTC(year, monthIndex + 1, 0)).getUTCDate();
 
-    const averageEnergyPerDayKwh = (totalEnergy / daysInCurrentMonth).toFixed(1);
+    // Latest month details (first element since sorted month DESC)
+    const latestRecord = energyRecords[0];
+    const averageEnergyPerDayKwh = (latestRecord.kwhProduced / daysInCurrentMonth).toFixed(1);
 
     const totalCo2 = energyRecords.reduce((acc, curr) => acc + curr.kgCo2Reduced, 0);
     const carbonReductionTon = (totalCo2 / 1000).toFixed(1);
 
-    // Latest month details (first element since sorted month DESC)
-    const latestRecord = energyRecords[0];
     const costSavingsIdrMonthly = latestRecord.idrSaved.toString();
 
     // Calculate Month-on-Month change
