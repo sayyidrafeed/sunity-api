@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  db-local:
+    image: postgres:17-alpine
+    container_name: sunity_postgres_desiwulan
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: desi_dev
+      POSTGRES_PASSWORD: desi_password_local
+      POSTGRES_DB: sunity_dev_db
+    volumes:
+      - pgdata_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U desi_dev -d sunity_dev_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata_local:
