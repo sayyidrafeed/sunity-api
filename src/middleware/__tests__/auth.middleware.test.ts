@@ -58,7 +58,7 @@ describe("createRequireSession", () => {
 
 describe("requirePermission", () => {
   test("returns 403 when the role does not match", async () => {
-    const middleware = requirePermission(["admin"]);
+    const middleware = requirePermission("admin", ["read"]);
 
     let statusCode: number | undefined;
     let payload: unknown;
@@ -92,7 +92,7 @@ describe("requirePermission", () => {
   });
 
   test("continues when the role matches", async () => {
-    const middleware = requirePermission(["admin"]);
+    const middleware = requirePermission("admin", ["read"]);
 
     let nextCalled = false;
     const req = {

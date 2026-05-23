@@ -37,7 +37,7 @@ registry.registerPath({
 activityLogsRouter.get(
   "/campaigns/:id/activities",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateQuery(listActivityLogsQuerySchema),
   handlers.getCampaignActivities,

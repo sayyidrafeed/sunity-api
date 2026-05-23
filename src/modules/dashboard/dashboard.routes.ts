@@ -46,7 +46,7 @@ registry.registerPath({
 dashboardRouter.get(
   "/",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("dashboard", ["read"]),
   validateQuery(adminDashboardQuerySchema),
   handlers.getAdminDashboardHandler,
 );

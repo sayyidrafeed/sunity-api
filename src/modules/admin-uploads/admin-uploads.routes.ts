@@ -35,7 +35,7 @@ registry.registerPath({
 adminUploadsRouter.post(
   "/uploads/presign",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateBody(createAdminAssetUploadSessionSchema),
   postCreateAdminAssetUploadSession,
 );

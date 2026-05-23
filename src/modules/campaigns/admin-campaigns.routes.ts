@@ -44,7 +44,7 @@ registry.registerPath({
 adminCampaignsRouter.get(
   "/",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateQuery(listCampaignAdminQuerySchema),
   handlers.getListCampaignsAdmin,
 );
@@ -74,7 +74,7 @@ registry.registerPath({
 adminCampaignsRouter.post(
   "/",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateBody(createCampaignSchema),
   handlers.postCreateCampaign,
 );
@@ -105,7 +105,7 @@ registry.registerPath({
 adminCampaignsRouter.patch(
   "/:id/status",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(updateStatusSchema),
   handlers.patchUpdateStatus,
@@ -137,7 +137,7 @@ registry.registerPath({
 adminCampaignsRouter.patch(
   "/:id/publish",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(publishSchema),
   handlers.patchPublishCampaign,
@@ -168,7 +168,7 @@ registry.registerPath({
 adminCampaignsRouter.delete(
   "/:id",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   handlers.deleteCampaign,
 );
@@ -199,7 +199,7 @@ registry.registerPath({
 adminCampaignsRouter.post(
   "/:id/assets",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(attachAssetSchema),
   handlers.postAttachAsset,

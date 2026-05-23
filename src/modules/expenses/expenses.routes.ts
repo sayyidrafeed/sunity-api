@@ -44,7 +44,7 @@ registry.registerPath({
 expensesRouter.get(
   "/campaigns/:id/expenses",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateQuery(listExpensesQuerySchema),
   handlers.getListExpenses,
@@ -75,7 +75,7 @@ registry.registerPath({
 expensesRouter.post(
   "/campaigns/:id/expenses",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(createExpenseSchema),
   handlers.postCreateExpense,
@@ -106,7 +106,7 @@ registry.registerPath({
 expensesRouter.patch(
   "/campaigns/:id/expenses/:expenseId",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdWithExpenseIdSchema),
   validateBody(updateExpenseSchema),
   handlers.patchUpdateExpense,
@@ -136,7 +136,7 @@ registry.registerPath({
 expensesRouter.delete(
   "/campaigns/:id/expenses/:expenseId",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdWithExpenseIdSchema),
   handlers.deleteExpenseHandler,
 );

@@ -46,7 +46,7 @@ registry.registerPath({
 energyRouter.get(
   "/campaigns/:id/energy",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateQuery(listEnergyQuerySchema),
   handlers.getEnergyData,
@@ -81,7 +81,7 @@ registry.registerPath({
 energyRouter.post(
   "/campaigns/:id/energy",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(createEnergySchema),
   handlers.postCreateEnergy,
@@ -112,7 +112,7 @@ registry.registerPath({
 energyRouter.put(
   "/campaigns/:id/energy",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(campaignIdParamSchema),
   validateBody(createEnergySchema),
   handlers.putOverwriteEnergy,
@@ -143,7 +143,7 @@ registry.registerPath({
 energyRouter.patch(
   "/campaigns/:id/energy/:month",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(energyMonthParamSchema),
   validateBody(updateEnergySchema),
   handlers.patchUpdateEnergy,
@@ -173,7 +173,7 @@ registry.registerPath({
 energyRouter.delete(
   "/campaigns/:id/energy/:month",
   requireSession,
-  requirePermission(["admin"]),
+  requirePermission("admin", ["read", "write"]),
   validateParams(energyMonthParamSchema),
   handlers.deleteEnergyHandler,
 );
