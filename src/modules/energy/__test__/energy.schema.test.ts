@@ -43,4 +43,57 @@ describe("energy schema validation", () => {
       expect(validCoercion.data.kg_co2_reduced).toBe(75.2);
     }
   });
+
+  describe("bulkUploadEnergyBodySchema", () => {
+    const { bulkUploadEnergyBodySchema } = require("../energy.schema.js");
+
+    test("validates valid bulk payload", () => {
+      const valid = bulkUploadEnergyBodySchema.safeParse({
+        records: [
+          { month: "2026-05", kwhProduced: 120, idrSaved: 200000, kgCo2Reduced: 80 },
+          { month: "2026-06", kwhProduced: 150, idrSaved: 250000, kgCo2Reduced: 100 },
+        ],
+      });
+      expect(valid.success).toBe(true);
+    });
+
+    test("rejects empty records array", () => {
+      const invalid = bulkUploadEnergyBodySchema.safeParse({
+        records: [],
+      });
+      expect(invalid.success).toBe(false);
+      if (!invalid.success) {
+        expect(invalid.error.issues[0].message).toBe("At least one record is required");
+      }
+    });
+
+    test("rejects duplicate months in the same request", () => {
+      const invalid = bulkUploadEnergyBodySchema.safeParse({
+        records: [
+          { month: "2026-05", kwhProduced: 120, idrSaved: 200000, kgCo2Reduced: 80 },
+          { month: "2026-05", kwhProduced: 150, idrSaved: 250000, kgCo2Reduced: 100 },
+        ],
+      });
+      expect(invalid.success).toBe(false);
+      if (!invalid.success) {
+        expect(invalid.error.issues[0].message).toBe(
+          "Duplicate months are not allowed in the same request",
+        );
+      }
+    });
+
+    test("rejects payloads exceeding 100 records", () => {
+      const records = Array.from({ length: 101 }, (_, i) => {
+        const year = 2026 + Math.floor(i / 12);
+        const monthNum = (i % 12) + 1;
+        const month = `${year}-${monthNum.toString().padStart(2, "0")}`;
+        return { month, kwhProduced: 10, idrSaved: 1000, kgCo2Reduced: 5 };
+      });
+      const invalid = bulkUploadEnergyBodySchema.safeParse({ records });
+      expect(invalid.success).toBe(false);
+      if (!invalid.success) {
+        expect(invalid.error.issues[0].message).toBe("Maximum 100 records per request");
+      }
+    });
+  });
 });

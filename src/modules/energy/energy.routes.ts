@@ -12,6 +12,8 @@ import {
   listEnergyQuerySchema,
   updateEnergySchema,
   successResponseSchema,
+  bulkUploadEnergyBodySchema,
+  bulkUploadEnergyResponseSchema,
 } from "./energy.schema.js";
 import * as handlers from "./energy.handlers.js";
 
@@ -176,4 +178,39 @@ energyRouter.delete(
   requirePermission("admin", ["read", "write"]),
   validateParams(energyMonthParamSchema),
   handlers.deleteEnergyHandler,
+);
+
+registry.registerPath({
+  method: "post",
+  path: "/admin/campaigns/{id}/energy/bulk",
+  tags: ["Admin Energy"],
+  summary: "Bulk upload energy records",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: campaignIdParamSchema,
+    body: { content: { "application/json": { schema: bulkUploadEnergyBodySchema } } },
+  },
+  responses: {
+    201: {
+      description: "Energy records uploaded successfully",
+      content: { "application/json": { schema: bulkUploadEnergyResponseSchema } },
+    },
+    400: {
+      description: "Invalid request body",
+      content: { "application/json": { schema: errorSchema } },
+    },
+    404: {
+      description: "Campaign not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+});
+
+energyRouter.post(
+  "/campaigns/:id/energy/bulk",
+  requireSession,
+  requirePermission("admin", ["read", "write"]),
+  validateParams(campaignIdParamSchema),
+  validateBody(bulkUploadEnergyBodySchema),
+  handlers.postBulkUploadEnergy,
 );
