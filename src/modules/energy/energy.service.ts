@@ -123,9 +123,9 @@ export async function createEnergyRecord(
     .values({
       campaignId,
       month: data.month,
-      kwhProduced: Number(data.kwhProduced),
-      idrSaved: Number(data.idrSaved),
-      kgCo2Reduced: Number(data.kgCo2Reduced),
+      kwhProduced: data.kwhProduced,
+      idrSaved: data.idrSaved,
+      kgCo2Reduced: data.kgCo2Reduced,
     })
     .returning();
   return record;
@@ -147,16 +147,16 @@ export async function overwriteEnergyRecord(
     .values({
       campaignId,
       month: data.month,
-      kwhProduced: Number(data.kwhProduced),
-      idrSaved: Number(data.idrSaved),
-      kgCo2Reduced: Number(data.kgCo2Reduced),
+      kwhProduced: data.kwhProduced,
+      idrSaved: data.idrSaved,
+      kgCo2Reduced: data.kgCo2Reduced,
     })
     .onConflictDoUpdate({
       target: [energyData.campaignId, energyData.month],
       set: {
-        kwhProduced: Number(data.kwhProduced),
-        idrSaved: Number(data.idrSaved),
-        kgCo2Reduced: Number(data.kgCo2Reduced),
+        kwhProduced: data.kwhProduced,
+        idrSaved: data.idrSaved,
+        kgCo2Reduced: data.kgCo2Reduced,
         updatedAt: new Date(),
       },
     })
@@ -170,9 +170,9 @@ export async function updateEnergyRecord(
   data: z.infer<typeof updateEnergySchema>,
 ) {
   const updateData: Record<string, unknown> = { updatedAt: new Date() };
-  if (data.kwhProduced !== undefined) updateData.kwhProduced = Number(data.kwhProduced);
-  if (data.idrSaved !== undefined) updateData.idrSaved = Number(data.idrSaved);
-  if (data.kgCo2Reduced !== undefined) updateData.kgCo2Reduced = Number(data.kgCo2Reduced);
+  if (data.kwhProduced !== undefined) updateData.kwhProduced = data.kwhProduced;
+  if (data.idrSaved !== undefined) updateData.idrSaved = data.idrSaved;
+  if (data.kgCo2Reduced !== undefined) updateData.kgCo2Reduced = data.kgCo2Reduced;
 
   const [record] = await db
     .update(energyData)
@@ -219,9 +219,9 @@ export async function bulkUploadEnergyRecords(
   const values = records.map((data) => ({
     campaignId,
     month: data.month,
-    kwhProduced: Number(data.kwhProduced),
-    idrSaved: Number(data.idrSaved),
-    kgCo2Reduced: Number(data.kgCo2Reduced),
+    kwhProduced: data.kwhProduced,
+    idrSaved: data.idrSaved,
+    kgCo2Reduced: data.kgCo2Reduced,
   }));
 
   const upserted = await repository
