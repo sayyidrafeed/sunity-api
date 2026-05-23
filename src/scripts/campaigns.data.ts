@@ -1,4 +1,6 @@
-export const getCampaignsSeedData = (worshipPlaceId: string) => [
+import type { NewCampaign } from "../db/schema/index.js";
+
+export const getCampaignsSeedData = (worshipPlaceId: string): NewCampaign[] => [
   {
     title: "Instalasi Panel Surya Masjid Raya Al-Ikhlas",
     description: "Bantu kami mendanai panel surya untuk kemandirian energi masjid.",
@@ -15,12 +17,10 @@ export const getCampaignsSeedData = (worshipPlaceId: string) => [
     electricitySavingsIdrMonthly: 1000000,
     impactDescription: "Mengurangi biaya listrik bulanan masjid sebesar 60%.",
     coverImageUrl: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09",
-    status: "AKTIF" as const,
+    status: "AKTIF",
     isPublished: true,
     deadline: new Date("2026-12-31T23:59:59Z"),
     worshipPlaceId: worshipPlaceId,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     title: "Energi Hijau untuk Gereja Santa Maria",
@@ -38,11 +38,9 @@ export const getCampaignsSeedData = (worshipPlaceId: string) => [
     electricitySavingsIdrMonthly: 1500000,
     impactDescription: "Mendukung gerakan paroki hijau ramah lingkungan.",
     coverImageUrl: "https://images.unsplash.com/photo-1548625361-155deee25919",
-    status: "DRAFT" as const,
+    status: "DRAFT",
     isPublished: false,
     deadline: new Date("2026-10-15T23:59:59Z"),
     worshipPlaceId: worshipPlaceId,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
 ];

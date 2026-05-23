@@ -1,58 +1,56 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import { users, campaigns, donations } from "../db/schema/index.js";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { env } from "../env.js";
+import { users, campaigns, donations, worshipPlaces } from "../db/schema/index.js";
 import { usersSeedData } from "./users.data.js";
+import { getWorshipPlacesSeedData } from "./worship-places.data.js";
 import { getCampaignsSeedData } from "./campaigns.data.js";
 import { getDonationsSeedData } from "./donations.data.js";
 
-const dbUrl =
-  (process.env as any).DATABASE_URL ||
-  "postgres://desi_dev:desi_password_local@localhost:5433/sunity_dev_db";
-
-const pool = new pg.Pool({
-  connectionString: dbUrl,
-});
-const db = drizzle(pool);
+const client = postgres(env.databaseUrl, { prepare: false });
+const db = drizzle(client);
 
 async function main(): Promise<void> {
   console.log("Memulai proses seeding database Sunity...");
 
   try {
-    console.log("Mengosongkan data tabel lama di Docker...");
+    console.log("Mengosongkan data tabel lama...");
     await db.delete(donations);
     await db.delete(campaigns);
+    await db.delete(worshipPlaces);
     await db.delete(users);
 
     console.log("Menyuntikkan data users...");
-    const insertedUsers = await db
-      .insert(users)
-      .values(usersSeedData as any)
+    const insertedUsers = await db.insert(users).values(usersSeedData).returning();
+
+    console.log("Menyuntikkan data worship places...");
+    const insertedWorshipPlaces = await db
+      .insert(worshipPlaces)
+      .values(getWorshipPlacesSeedData())
       .returning();
 
-    const donor = insertedUsers.find((u) => u.email === "rian@gmail.com");
-
-    if (!donor) {
-      throw new Error("Gagal memetakan akun user untuk relasi database.");
+    const firstWorshipPlace = insertedWorshipPlaces[0];
+    if (!firstWorshipPlace) {
+      throw new Error("Gagal menyuntik data worship place.");
     }
 
     console.log("Menyuntikkan data campaigns...");
-    const staticWorshipPlaceId = "00000000-0000-0000-0000-000000000000";
     const insertedCampaigns = await db
       .insert(campaigns)
-      .values(getCampaignsSeedData(staticWorshipPlaceId) as any)
+      .values(getCampaignsSeedData(firstWorshipPlace.id))
       .returning();
 
     console.log("Menyuntikkan data transaksi donations...");
-    await db.insert(donations).values(getDonationsSeedData(insertedCampaigns, donor.id) as any);
+    const donor = insertedUsers.find((u) => u.email === "rian@gmail.com");
+    const donorId = donor?.id ?? "unknown";
+    await db.insert(donations).values(getDonationsSeedData(insertedCampaigns, donorId));
 
-    console.log("Database lokal berhasil di-seed penuh untuk pengujian semua endpoint.");
-    process.exit(0);
+    console.log("✓ Database berhasil di-seed penuh untuk pengujian semua endpoint.");
   } catch (error) {
-    // Memakai variabel 'error' agar linter tidak protes lagi
-    console.error("Seeding database gagal dilakukan:", error);
+    console.error("✗ Seeding database gagal dilakukan:", error);
     process.exit(1);
   } finally {
-    await pool.end();
+    await client.end();
   }
 }
 
