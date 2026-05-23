@@ -56,9 +56,5 @@ export const adminDashboardResponseDataSchema = z.object({
   recentDonations: z.array(dashboardRecentDonationSchema),
 });
 
-export const adminDashboardResponseSchema = z
-  .object({
-    data: adminDashboardResponseDataSchema,
-    error: z.null().optional(),
-  })
-  .openapi("AdminDashboardResponse");
+export const adminDashboardResponseSchema =
+  adminDashboardResponseDataSchema.openapi("AdminDashboardResponse");

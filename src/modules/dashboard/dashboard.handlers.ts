@@ -12,11 +12,10 @@ export async function getAdminDashboardHandler(
 
   try {
     const data = await getAdminDashboard(query.campaignId);
-    res.json({ data, error: null });
+    res.json(data);
   } catch (error) {
     if (error instanceof CampaignNotFoundError) {
       res.status(404).json({
-        data: null,
         error: {
           code: error.errorCode,
           message: error.userMessage,
