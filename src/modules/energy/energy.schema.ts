@@ -31,7 +31,7 @@ export const uploadEnergyCsvSchema = z.object({
 });
 
 export const energyCsvRowSchema = z.object({
-  month: z.string().length(7),
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Must be in YYYY-MM format"),
   kwh_produced: z.coerce.number().min(0),
   idr_saved: z.coerce.number().int().min(0),
   kg_co2_reduced: z.coerce.number().min(0),
@@ -43,7 +43,7 @@ export const campaignIdParamSchema = z.object({
 
 export const energyMonthParamSchema = z.object({
   id: z.string().uuid(),
-  month: z.string().length(7),
+  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Must be in YYYY-MM format"),
 });
 
 export const listEnergyQuerySchema = z.object({
