@@ -1,4 +1,4 @@
-import { eq, and, sql, asc, desc } from "drizzle-orm";
+import { eq, and, sql, asc, desc, inArray } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { energyData, campaigns } from "../../db/schema/index.js";
 import type { z } from "zod";
@@ -31,8 +31,8 @@ export class EnergyRecordConflictError extends ConflictError {
   }
 }
 
-async function verifyCampaignCompleted(campaignId: string): Promise<boolean> {
-  const [campaign] = await db
+async function verifyCampaignCompleted(campaignId: string, repository = db): Promise<boolean> {
+  const [campaign] = await repository
     .select({ id: campaigns.id, status: campaigns.status })
     .from(campaigns)
     .where(eq(campaigns.id, campaignId));
@@ -190,4 +190,59 @@ export async function deleteEnergyRecord(campaignId: string, month: string) {
     .returning();
   if (!record) throw new EnergyRecordNotFoundError(month);
   return record;
+}
+
+export async function bulkUploadEnergyRecords(
+  campaignId: string,
+  records: z.infer<typeof createEnergySchema>[],
+  repository = db,
+) {
+  const isCompleted = await verifyCampaignCompleted(campaignId, repository);
+  if (!isCompleted) {
+    throw new ConflictError(
+      "Campaign must be completed to add energy records",
+      "CAMPAIGN_NOT_COMPLETED",
+    );
+  }
+
+  const months = records.map((r) => r.month);
+
+  const existingRecords = await repository
+    .select({ month: energyData.month })
+    .from(energyData)
+    .where(and(eq(energyData.campaignId, campaignId), inArray(energyData.month, months)));
+
+  const existingMonths = new Set(existingRecords.map((r) => r.month));
+  const updatedCount = existingMonths.size;
+  const createdCount = records.length - updatedCount;
+
+  const values = records.map((data) => ({
+    campaignId,
+    month: data.month,
+    kwhProduced: Number(data.kwhProduced),
+    idrSaved: Number(data.idrSaved),
+    kgCo2Reduced: Number(data.kgCo2Reduced),
+  }));
+
+  const upserted = await repository
+    .insert(energyData)
+    .values(values)
+    .onConflictDoUpdate({
+      target: [energyData.campaignId, energyData.month],
+      set: {
+        kwhProduced: sql`EXCLUDED.kwh_produced`,
+        idrSaved: sql`EXCLUDED.idr_saved`,
+        kgCo2Reduced: sql`EXCLUDED.kg_co2_reduced`,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+
+  upserted.sort((a, b) => a.month.localeCompare(b.month));
+
+  return {
+    data: upserted,
+    created: createdCount,
+    updated: updatedCount,
+  };
 }

@@ -8,6 +8,7 @@ import type {
   createEnergySchema,
   listEnergyQuerySchema,
   updateEnergySchema,
+  bulkUploadEnergyBodySchema,
 } from "./energy.schema.js";
 
 export async function getEnergyData(
@@ -154,6 +155,34 @@ export async function deleteEnergyHandler(
       res.status(404).json({ error: error.message });
       return;
     }
+    next(error);
+  }
+}
+
+export async function postBulkUploadEnergy(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const params = req.validatedParams as z.infer<typeof campaignIdParamSchema>;
+    const body = req.validatedBody as z.infer<typeof bulkUploadEnergyBodySchema>;
+    const result = await service.bulkUploadEnergyRecords(params.id, body.records);
+    if (req.session?.user?.id) {
+      await logActivity({
+        campaignId: params.id,
+        actorId: req.session.user.id,
+        action: "ENERGY_RECORD_BULK_UPLOADED",
+        entityType: "energy",
+        metadata: {
+          count: result.data.length,
+          created: result.created,
+          updated: result.updated,
+        },
+      });
+    }
+    res.status(201).json(result);
+  } catch (error) {
     next(error);
   }
 }
