@@ -9,6 +9,7 @@ import {
   listCampaignAdminQuerySchema,
   campaignIdParamSchema,
   campaignListResponseSchema,
+  campaignDetailSchema,
   attachAssetSchema,
   attachAssetResponseSchema,
   successResponseSchema,
@@ -47,6 +48,36 @@ adminCampaignsRouter.get(
   requirePermission("admin", ["read", "write"]),
   validateQuery(listCampaignAdminQuerySchema),
   handlers.getListCampaignsAdmin,
+);
+
+// GET /api/admin/campaigns/:id - Get campaign detail (admin only)
+registry.registerPath({
+  method: "get",
+  path: "/admin/campaigns/{id}",
+  tags: ["Admin Campaigns"],
+  summary: "Get campaign details (admin only)",
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: campaignIdParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Campaign details",
+      content: { "application/json": { schema: campaignDetailSchema } },
+    },
+    404: {
+      description: "Campaign not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+});
+
+adminCampaignsRouter.get(
+  "/:id",
+  requireSession,
+  requirePermission("admin", ["read", "write"]),
+  validateParams(campaignIdParamSchema),
+  handlers.getCampaignById,
 );
 
 // POST /api/admin/campaigns - Create campaign (admin)

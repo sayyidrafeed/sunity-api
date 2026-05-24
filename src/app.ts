@@ -55,7 +55,7 @@ app.use("/api/admin/worship-places", worshipPlacesRouter);
 app.use("/api/admin", expensesRouter);
 app.use("/api/admin", activityLogsRouter);
 app.use("/api/admin", adminUploadsRouter);
-app.use("/api/admin/energy", energyRouter);
+app.use("/api/admin", energyRouter);
 app.use("/api/admin/dashboard", dashboardRouter);
 
 app.use(globalErrorHandler);

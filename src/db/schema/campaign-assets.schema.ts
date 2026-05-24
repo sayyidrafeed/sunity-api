@@ -9,7 +9,7 @@ export const campaignAssets = pgTable(
     campaignId: uuid("campaign_id").notNull(),
     assetId: uuid("asset_id").notNull(),
     kind: varchar("kind", {
-      enum: ["cover", "gallery", "transparency", "installation", "report"],
+      enum: ["cover", "gallery", "transparency", "installation", "report", "other"],
     })
       .notNull()
       .default("cover"),

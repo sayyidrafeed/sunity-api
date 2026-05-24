@@ -9,7 +9,7 @@ export const createCampaignSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().min(1).max(5000),
   targetIdr: z.number().int().positive().min(100_000).max(100_000_000_000),
-  panelCapacityKwp: z.string(),
+  panelCapacityKwp: z.string().optional(),
   estimatedKwhAnnual: z.string().optional(),
   estimatedIdrSavings: z.number().int().positive().optional(),
   coverImageUrl: z.string().url().optional(),
@@ -169,7 +169,7 @@ export const campaignCreatedResponseSchema = z.object({
 // Attach asset to campaign
 export const attachAssetSchema = z.object({
   assetId: z.string().uuid(),
-  kind: z.enum(["cover", "gallery", "transparency", "installation", "report"]),
+  kind: z.enum(["cover", "gallery", "transparency", "installation", "report", "other"]),
   sortOrder: z.number().int().nonnegative(),
   caption: z.string().optional(),
 });

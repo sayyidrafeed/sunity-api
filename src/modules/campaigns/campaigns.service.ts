@@ -51,6 +51,7 @@ export async function createCampaign(userId: string, data: z.infer<typeof create
     .insert(campaigns)
     .values({
       ...rest,
+      panelCapacityKwp: rest.panelCapacityKwp ?? "0.00",
       energyProducedKwhMonthly: rest.energyProducedKwhMonthly ?? undefined,
       carbonReductionKgMonthly: rest.carbonReductionKgMonthly ?? undefined,
       deadline: new Date(deadline),
@@ -238,7 +239,7 @@ export async function attachAssetToCampaign(
   campaignId: string,
   input: {
     assetId: string;
-    kind: "cover" | "gallery" | "transparency" | "installation" | "report";
+    kind: "cover" | "gallery" | "transparency" | "installation" | "report" | "other";
     sortOrder: number;
     caption?: string;
   },
