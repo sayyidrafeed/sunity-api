@@ -1,6 +1,9 @@
 import { createSelectSchema } from "drizzle-zod";
+import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import { campaigns } from "../../db/schema/index.js";
+
+extendZodWithOpenApi(z);
 
 export const createCampaignSchema = z.object({
   title: z.string().min(1).max(200),
@@ -85,6 +88,7 @@ export const campaignCardSchema = z.object({
   deadline: z.string().datetime(),
   progressPercent: z.number(),
   coverImage: assetImageSchema.nullable().optional(),
+  createdAt: z.string().datetime(),
 });
 
 export const campaignListResponseSchema = z.object({

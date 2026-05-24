@@ -77,6 +77,7 @@ export async function mapCampaignToCard(
         ? Math.min(100, Math.round((campaign.raisedIdr / campaign.targetIdr) * 100))
         : 0,
     coverImage,
+    createdAt: campaign.createdAt.toISOString(),
   };
 }
 
