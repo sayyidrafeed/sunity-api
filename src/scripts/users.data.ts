@@ -15,4 +15,32 @@ export const usersSeedData: NewUser[] = [
     emailVerified: true,
     role: "user",
   },
+  {
+    id: "user-donor-uuid-3333",
+    name: "Budi Pratama",
+    email: "budi@gmail.com",
+    emailVerified: true,
+    role: "user",
+  },
+  {
+    id: "user-donor-uuid-4444",
+    name: "Ani Wijaya",
+    email: "ani@gmail.com",
+    emailVerified: true,
+    role: "user",
+  },
+  {
+    id: "user-donor-uuid-5555",
+    name: "Yusuf Ibrahim",
+    email: "yusuf@gmail.com",
+    emailVerified: true,
+    role: "user",
+  },
+  {
+    id: "user-donor-uuid-6666",
+    name: "Melati Lestari",
+    email: "melati@gmail.com",
+    emailVerified: true,
+    role: "user",
+  },
 ];

@@ -1,6 +1,6 @@
 import type { NewWorshipPlace } from "../db/schema/index.js";
 
-export const getWorshipPlacesSeedData = (): NewWorshipPlace[] => [
+export const getWorshipPlacesSeedData = (thumbnailAssetIds: string[] = []): NewWorshipPlace[] => [
   {
     name: "Masjid Raya Al-Ikhlas",
     religionType: "Masjid",
@@ -8,8 +8,9 @@ export const getWorshipPlacesSeedData = (): NewWorshipPlace[] => [
     city: "Jakarta",
     contactPerson: "Pak Ahmad",
     contactPhone: "+62-812-3456-7890",
-    currentCondition: "Baik",
+    currentCondition: "Memerlukan panel surya kapasitas sedang untuk operasional harian.",
     personInCharge: "Pak Haji Mahmud",
+    thumbnailAssetId: thumbnailAssetIds[0] || null,
   },
   {
     name: "Gereja Santa Maria",
@@ -18,7 +19,41 @@ export const getWorshipPlacesSeedData = (): NewWorshipPlace[] => [
     city: "Jakarta",
     contactPerson: "Ibu Siti",
     contactPhone: "+62-821-9876-5432",
-    currentCondition: "Baik",
+    currentCondition: "Kondisi fisik baik, konsumsi listrik tinggi di akhir pekan.",
     personInCharge: "Pdt. Bambang",
+    thumbnailAssetId: thumbnailAssetIds[1] || null,
+  },
+  {
+    name: "Pura Agung Jagatnatha",
+    religionType: "Pura",
+    address: "Jl. Diponegoro No. 789, Denpasar",
+    city: "Denpasar",
+    contactPerson: "I Wayan Dharma",
+    contactPhone: "+62-813-5555-4444",
+    currentCondition: "Kondisi baik, area terbuka sangat luas cocok untuk solar panel.",
+    personInCharge: "Jero Mangku Gede",
+    thumbnailAssetId: thumbnailAssetIds[2] || null,
+  },
+  {
+    name: "Vihara Dharma Bhakti",
+    religionType: "Vihara",
+    address: "Jl. Kemenangan III No. 13, Glodok",
+    city: "Jakarta",
+    contactPerson: "Suryadi",
+    contactPhone: "+62-878-1111-2222",
+    currentCondition: "Membutuhkan kemandirian energi untuk penerangan lampion dan aula.",
+    personInCharge: "Bante Sudharma",
+    thumbnailAssetId: thumbnailAssetIds[3] || null,
+  },
+  {
+    name: "Klenteng Boen Tek Bio",
+    religionType: "Klenteng",
+    address: "Jl. Pasar Anyar No. 10, Tangerang",
+    city: "Tangerang",
+    contactPerson: "Herman",
+    contactPhone: "+62-815-9999-8888",
+    currentCondition: "Kondisi cagar budaya baik, ingin mengurangi biaya listrik bulanan.",
+    personInCharge: "Suhu Wijaya",
+    thumbnailAssetId: thumbnailAssetIds[4] || null,
   },
 ];
