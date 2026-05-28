@@ -1,6 +1,7 @@
-import { pgTable, uuid, text, timestamp, integer, foreignKey, varchar } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, integer, foreignKey } from "drizzle-orm/pg-core";
 import { campaigns } from "./campaigns.schema.js";
 import { assets } from "./assets.schema.js";
+import { campaignAssetKindEnum } from "./enums.schema.js";
 
 export const campaignAssets = pgTable(
   "campaign_assets",
@@ -8,11 +9,7 @@ export const campaignAssets = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     campaignId: uuid("campaign_id").notNull(),
     assetId: uuid("asset_id").notNull(),
-    kind: varchar("kind", {
-      enum: ["cover", "gallery", "transparency", "installation", "report", "other"],
-    })
-      .notNull()
-      .default("cover"),
+    kind: campaignAssetKindEnum("kind").notNull().default("cover"),
     sortOrder: integer("sort_order").default(0).notNull(),
     caption: text("caption"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

@@ -47,7 +47,7 @@ export const listCampaignQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).default(12),
   search: z.string().optional(),
   city: z.string().optional(),
-  type: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]).optional(),
+  type: z.enum(["Masjid", "Gereja", "Pura", "Vihara", "Klenteng"]).optional(),
   status: z
     .enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED", "Completed"])
     .transform((val) => (val === "Completed" ? "SELESAI" : val))

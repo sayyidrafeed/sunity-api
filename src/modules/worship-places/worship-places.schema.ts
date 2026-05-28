@@ -23,7 +23,7 @@ export const worshipPlaceSchema = worshipPlaceSelectSchema
 
 export const createWorshipPlaceSchema = z.object({
   name: z.string().min(1).max(200),
-  religionType: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]),
+  religionType: z.enum(["Masjid", "Gereja", "Pura", "Vihara", "Klenteng"]),
   address: z.string().min(1).max(500),
   city: z.string().min(1),
   contactPerson: z.string().optional(),

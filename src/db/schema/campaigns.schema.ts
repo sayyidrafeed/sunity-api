@@ -9,6 +9,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { worshipPlaces } from "./worship-places.schema.js";
+import { campaignStatusEnum } from "./enums.schema.js";
 
 export const campaigns = pgTable("campaigns", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -30,10 +31,7 @@ export const campaigns = pgTable("campaigns", {
   impactDescription: text("impact_description"),
 
   coverImageUrl: text("cover_image_url"),
-  status: text("status")
-    .$type<"DRAFT" | "AKTIF" | "INSTALASI" | "SELESAI" | "ARCHIVED">()
-    .default("DRAFT")
-    .notNull(),
+  status: campaignStatusEnum("status").default("DRAFT").notNull(),
   isPublished: boolean("is_published").default(false).notNull(),
   deadline: timestamp("deadline", { withTimezone: true }).notNull(),
   worshipPlaceId: uuid("worship_place_id")

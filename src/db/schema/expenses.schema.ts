@@ -1,6 +1,7 @@
 import { bigint, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { campaigns } from "./campaigns.schema.js";
 import { assets } from "./assets.schema.js";
+import { expenseCategoryEnum } from "./enums.schema.js";
 
 export const expenses = pgTable("expenses", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -12,9 +13,7 @@ export const expenses = pgTable("expenses", {
   amountIdr: bigint("amount_idr", { mode: "number" }).notNull(),
   spentAt: timestamp("spent_at", { withTimezone: true }).notNull(),
   receiptAssetId: uuid("receipt_asset_id").references(() => assets.id),
-  category: text("category")
-    .$type<"EQUIPMENT" | "INSTALLATION" | "MATERIAL" | "OPERATIONAL" | "OTHER">()
-    .notNull(),
+  category: expenseCategoryEnum("category").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });

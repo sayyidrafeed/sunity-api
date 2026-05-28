@@ -1,3 +1,4 @@
+export * from "./enums.schema.js";
 export * from "./auth-schema.js";
 export * from "./campaigns.schema.js";
 export * from "./assets.schema.js";
