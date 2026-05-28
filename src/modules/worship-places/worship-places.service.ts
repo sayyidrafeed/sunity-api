@@ -1,4 +1,5 @@
-import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { worshipPlaces } from "../../db/schema/index.js";
 import type { z } from "zod";
@@ -18,12 +19,14 @@ export class WorshipPlaceNotFoundError extends NotFoundError {
 export async function listWorshipPlaces(query: z.infer<typeof listWorshipPlacesQuerySchema>) {
   const { page, limit, search, city } = query;
   const offset = (page - 1) * limit;
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (search) {
-    conditions.push(
-      or(ilike(worshipPlaces.name, `%${search}%`), ilike(worshipPlaces.city, `%${search}%`)),
+    const searchCondition = or(
+      ilike(worshipPlaces.name, `%${search}%`),
+      ilike(worshipPlaces.city, `%${search}%`),
     );
+    if (searchCondition) conditions.push(searchCondition);
   }
 
   if (city) conditions.push(ilike(worshipPlaces.city, `%${city}%`));
@@ -31,7 +34,13 @@ export async function listWorshipPlaces(query: z.infer<typeof listWorshipPlacesQ
   const where = conditions.length ? and(...conditions) : undefined;
 
   const [data, countResult] = await Promise.all([
-    db.select().from(worshipPlaces).where(where).limit(limit).offset(offset),
+    db
+      .select()
+      .from(worshipPlaces)
+      .where(where)
+      .orderBy(desc(worshipPlaces.createdAt), desc(worshipPlaces.id))
+      .limit(limit)
+      .offset(offset),
     db
       .select({ count: sql<number>`count(*)` })
       .from(worshipPlaces)

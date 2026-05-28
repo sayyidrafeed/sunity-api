@@ -2,6 +2,11 @@ import { createSelectSchema } from "drizzle-zod";
 import { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { z } from "zod";
 import { campaigns } from "../../db/schema/index.js";
+import {
+  campaignStatusValues,
+  religionTypeValues,
+  campaignAssetKindValues,
+} from "../../db/schema/enums.schema.js";
 
 extendZodWithOpenApi(z);
 
@@ -31,7 +36,7 @@ export const createCampaignSchema = z.object({
 export const updateCampaignSchema = createCampaignSchema.partial();
 
 export const updateStatusSchema = z.object({
-  status: z.enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED"]),
+  status: z.enum(campaignStatusValues),
 });
 
 export const publishSchema = z.object({
@@ -47,9 +52,9 @@ export const listCampaignQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).default(12),
   search: z.string().optional(),
   city: z.string().optional(),
-  type: z.enum(["Masjid", "Mushalla", "Gereja", "Pura", "Vihara", "Klenteng"]).optional(),
+  type: z.enum(religionTypeValues).optional(),
   status: z
-    .enum(["DRAFT", "AKTIF", "INSTALASI", "SELESAI", "ARCHIVED", "Completed"])
+    .enum([...campaignStatusValues, "Completed"] as const)
     .transform((val) => (val === "Completed" ? "SELESAI" : val))
     .optional(),
   sortBy: z.enum(["createdAt", "deadline", "raisedProgress", "targetIdr"]).default("createdAt"),
@@ -169,7 +174,7 @@ export const campaignCreatedResponseSchema = z.object({
 // Attach asset to campaign
 export const attachAssetSchema = z.object({
   assetId: z.string().uuid(),
-  kind: z.enum(["cover", "gallery", "transparency", "installation", "report", "other"]),
+  kind: z.enum(campaignAssetKindValues),
   sortOrder: z.number().int().nonnegative(),
   caption: z.string().optional(),
 });

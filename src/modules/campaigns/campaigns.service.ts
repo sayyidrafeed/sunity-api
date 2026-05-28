@@ -1,4 +1,5 @@
-import { eq, ilike, and, sql, or } from "drizzle-orm";
+import { eq, ilike, and, sql, or, inArray } from "drizzle-orm";
+import type { SQL } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { campaigns, campaignAssets, assets, worshipPlaces } from "../../db/schema/index.js";
 import type { z } from "zod";
@@ -34,7 +35,7 @@ export class AssetNotFoundError extends NotFoundError {
  */
 export async function getCampaignCard(id: string) {
   const campaign = await getCampaignById(id);
-  return mapCampaignToCard(campaign.campaign, campaign.worshipPlace);
+  return await mapCampaignToCard(campaign.campaign, campaign.worshipPlace);
 }
 
 /**
@@ -70,15 +71,14 @@ async function listCampaignsInternal(
 ) {
   const { page, limit, search, city, type, status, sortBy, order, isPublishedOnly = true } = query;
   const offset = (page - 1) * limit;
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (search) {
-    conditions.push(
-      or(
-        ilike(campaigns.title, `%${search}%`),
-        ilike(worshipPlaces.name, `%${search}%`),
-        ilike(worshipPlaces.city, `%${search}%`),
-      ),
+    const searchCondition = or(
+      ilike(campaigns.title, `%${search}%`),
+      ilike(worshipPlaces.name, `%${search}%`),
+      ilike(worshipPlaces.city, `%${search}%`),
     );
+    if (searchCondition) conditions.push(searchCondition);
   }
   if (city) conditions.push(ilike(worshipPlaces.city, `%${city}%`));
   if (type) conditions.push(eq(worshipPlaces.religionType, type));
@@ -118,29 +118,31 @@ async function listCampaignsInternal(
       .where(where),
   ]);
 
-  // Fetch all cover assets for the campaigns in a single query
+  // Fetch all cover assets for the campaigns in a single query.
+  // Guard: skip DB call when no campaigns to avoid invalid empty IN clause.
   const campaignIds = data.map((c) => c.campaign.id);
-  const coverAssets = await db
-    .select({
-      campaignId: campaignAssets.campaignId,
-      assetId: assets.id,
-      storageKey: assets.storageKey,
-    })
-    .from(campaignAssets)
-    .innerJoin(assets, eq(campaignAssets.assetId, assets.id))
-    .where(
-      and(
-        sql`${campaignAssets.campaignId} = ANY(${campaignIds})`,
-        eq(campaignAssets.kind, "cover"),
-      ),
-    );
+  const coverAssets = campaignIds.length
+    ? await db
+        .select({
+          campaignId: campaignAssets.campaignId,
+          assetId: assets.id,
+          storageKey: assets.storageKey,
+        })
+        .from(campaignAssets)
+        .innerJoin(assets, eq(campaignAssets.assetId, assets.id))
+        .where(
+          and(inArray(campaignAssets.campaignId, campaignIds), eq(campaignAssets.kind, "cover")),
+        )
+    : [];
 
   // Create a map for quick asset lookup
   const assetMap = new Map(coverAssets.map((a) => [a.campaignId, a]));
 
   // Map campaigns to card DTOs with preloaded assets
-  const cards = data.map((row) =>
-    mapCampaignToCard(row.campaign, row.worshipPlace, assetMap.get(row.campaign.id)),
+  const cards = await Promise.all(
+    data.map((row) =>
+      mapCampaignToCard(row.campaign, row.worshipPlace, assetMap.get(row.campaign.id)),
+    ),
   );
 
   return {

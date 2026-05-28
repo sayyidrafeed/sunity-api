@@ -1,12 +1,11 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { assets } from "./assets.schema.js";
+import { religionTypeEnum } from "./enums.schema.js";
 
 export const worshipPlaces = pgTable("worship_places", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
-  religionType: text("religion_type")
-    .$type<"Masjid" | "Mushalla" | "Gereja" | "Pura" | "Vihara" | "Klenteng">()
-    .notNull(),
+  religionType: religionTypeEnum("religion_type").notNull(),
   address: text("address").notNull(),
   city: text("city").notNull(),
   contactPerson: text("contact_person"),

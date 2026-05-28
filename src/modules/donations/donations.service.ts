@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import { eq, and, desc, sql } from "drizzle-orm";
 import midtransClient from "midtrans-client";
 import { db } from "../../db/client.js";
-import { donations, campaigns } from "../../db/schema/index.js";
+import { donations, campaigns, type DonationStatus } from "../../db/schema/index.js";
 import type { z } from "zod";
 import type {
   createDonationSchema,
@@ -160,7 +160,7 @@ export async function processMidtransWebhook(data: z.infer<typeof midtransWebhoo
     throw new DonationNotFoundError(order_id);
   }
 
-  let finalStatus = "PENDING";
+  let finalStatus: DonationStatus = "PENDING";
   if (transaction_status === "settlement" || transaction_status === "capture") {
     finalStatus = "SUCCESS";
   } else if (transaction_status === "deny" || transaction_status === "cancel") {

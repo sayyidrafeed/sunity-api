@@ -1,5 +1,6 @@
 import { pgTable, uuid, bigint, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { campaigns } from "./campaigns.schema.js";
+import { donationStatusEnum } from "./enums.schema.js";
 
 export const donations = pgTable("donations", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -11,9 +12,9 @@ export const donations = pgTable("donations", {
   amountIdr: bigint("amount_idr", { mode: "number" }).notNull(),
   isAnonymous: boolean("is_anonymous").default(false).notNull(),
   midtransOrderId: text("midtrans_order_id").notNull().unique(),
-  status: text("status").default("PENDING").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  status: donationStatusEnum("status").default("PENDING").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
 export type Donation = typeof donations.$inferSelect;
