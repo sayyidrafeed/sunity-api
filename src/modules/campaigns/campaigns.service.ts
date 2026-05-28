@@ -35,7 +35,7 @@ export class AssetNotFoundError extends NotFoundError {
  */
 export async function getCampaignCard(id: string) {
   const campaign = await getCampaignById(id);
-  return mapCampaignToCard(campaign.campaign, campaign.worshipPlace);
+  return await mapCampaignToCard(campaign.campaign, campaign.worshipPlace);
 }
 
 /**

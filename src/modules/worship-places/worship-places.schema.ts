@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createSelectSchema } from "drizzle-zod";
 import { worshipPlaces } from "../../db/schema/index.js";
+import { religionTypeValues } from "../../db/schema/enums.schema.js";
 
 const worshipPlaceSelectSchema = createSelectSchema(worshipPlaces);
 
@@ -23,7 +24,7 @@ export const worshipPlaceSchema = worshipPlaceSelectSchema
 
 export const createWorshipPlaceSchema = z.object({
   name: z.string().min(1).max(200),
-  religionType: z.enum(["Masjid", "Gereja", "Pura", "Vihara", "Klenteng"]),
+  religionType: z.enum(religionTypeValues),
   address: z.string().min(1).max(500),
   city: z.string().min(1),
   contactPerson: z.string().optional(),
