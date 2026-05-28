@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "../../db/client.js";
 import { campaigns, expenses } from "../../db/schema/index.js";
 import type { z } from "zod";
@@ -46,7 +46,13 @@ export async function listExpenses(
   const where = and(eq(expenses.campaignId, campaignId));
 
   const [data, countResult] = await Promise.all([
-    db.select().from(expenses).where(where).limit(limit).offset(offset),
+    db
+      .select()
+      .from(expenses)
+      .where(where)
+      .orderBy(desc(expenses.spentAt), desc(expenses.id))
+      .limit(limit)
+      .offset(offset),
     db
       .select({ count: sql<number>`count(*)` })
       .from(expenses)
