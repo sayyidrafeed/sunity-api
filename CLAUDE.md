@@ -1,1 +1,1 @@
-Check the presence of AGENTS.md
+@AGENTS.md
