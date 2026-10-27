@@ -92,6 +92,13 @@
       "when": 1779981074033,
       "tag": "0012_chubby_gambit",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793064642478,
+      "tag": "0013_user_role_default",
+      "breakpoints": true
     }
   ]
 }
