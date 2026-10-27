@@ -144,6 +144,11 @@ export async function getCampaignDonations(
 export async function processMidtransWebhook(data: z.infer<typeof midtransWebhookPayloadSchema>) {
   const { order_id, status_code, gross_amount, signature_key, transaction_status } = data;
 
+  // Without a server key the signature is computable by anyone, so reject every webhook.
+  if (!env.midtransServerKey) {
+    throw new InvalidSignatureError();
+  }
+
   const payloadStr = `${order_id}${status_code}${gross_amount}${env.midtransServerKey}`;
   const expectedSignature = crypto.createHash("sha512").update(payloadStr).digest("hex");
 

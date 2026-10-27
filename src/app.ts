@@ -14,6 +14,7 @@ import { activityLogsRouter } from "./modules/activity-logs/activity-logs.index.
 import { adminUploadsRouter } from "./modules/admin-uploads/admin-uploads.index.js";
 import { energyRouter } from "./modules/energy/energy.index.js";
 import { dashboardRouter } from "./modules/dashboard/dashboard.index.js";
+import { donationsRouter } from "./modules/donations/donations.index.js";
 
 export const app = express();
 
@@ -22,7 +23,7 @@ app.use(
     origin: env.frontendUrls,
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization", "Origin"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );
 
@@ -49,6 +50,7 @@ app.get("/openapi.json", async (_req, res, next) => {
 app.use("/docs", apiReference({ pageTitle: "Sunity API Reference", url: "/openapi.json" }));
 
 app.use("/api/assets", assetsRouter);
+app.use("/api", donationsRouter);
 app.use("/api/campaigns", campaignsRouter);
 app.use("/api/admin/campaigns", adminCampaignsRouter);
 app.use("/api/admin/worship-places", worshipPlacesRouter);

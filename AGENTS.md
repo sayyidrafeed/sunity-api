@@ -79,8 +79,8 @@ src/
 Current modules: `activity-logs`, `admin-uploads`, `assets`, `campaigns`, `dashboard`,
 `donations`, `energy`, `expenses`, `worship-places`.
 
-> `donations` (Midtrans checkout + webhook) has routes and tests but `donationsRouter` is not
-> mounted in `src/app.ts` yet, so its endpoints are not served and not in `/openapi.json`.
+> `donationsRouter` is mounted at `/api` because it serves two prefixes:
+> `/api/campaigns/:id/donations` and `/api/webhook/midtrans`.
 
 ### Module File Roles
 

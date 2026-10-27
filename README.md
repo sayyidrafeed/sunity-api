@@ -112,7 +112,9 @@ All app routes are under `/api`. Admin routes require a Better Auth session with
 | ------------------------------------- | ---------------- | --------------------------------------- |
 | `/api/auth/*`                         | Better Auth      | Public                                  |
 | `/api/campaigns`                      | `campaigns`      | Public reads, session for create/update |
-| `/api/assets/assets/upload`\*\*       | `assets`         | Public (upload session)                 |
+| `/api/assets/upload`                  | `assets`         | Public (upload session)                 |
+| `/api/campaigns/:id/donations`        | `donations`      | Public (Midtrans Snap checkout, list)   |
+| `/api/webhook/midtrans`               | `donations`      | Midtrans (signature-checked)            |
 | `/api/admin/campaigns`                | `campaigns`      | Admin                                   |
 | `/api/admin/campaigns/:id/expenses`   | `expenses`       | Admin                                   |
 | `/api/admin/campaigns/:id/energy`     | `energy`         | Admin                                   |
@@ -121,12 +123,8 @@ All app routes are under `/api`. Admin routes require a Better Auth session with
 | `/api/admin/worship-places`           | `worship-places` | Admin                                   |
 | `/api/admin/dashboard`                | `dashboard`      | Admin                                   |
 
-\*\* The router is mounted at `/api/assets` and declares `/assets/upload`, so the served path
-repeats `assets`. The OpenAPI document lists it as `/assets/upload` (served as `/api/assets/upload`),
-which does not match.
-
-The `donations` module (Midtrans Snap checkout and webhook) exists in `src/modules/donations/`
-but is not mounted in `src/app.ts`, so its routes are not served yet.
+The Midtrans webhook verifies `signature_key` with `MIDTRANS_SERVER_KEY` and rejects every
+request with 403 when that key is not set.
 
 ## Authentication (Better Auth + Google)
 
@@ -141,5 +139,6 @@ errors Better Auth redirects to `<first FRONTEND_URLS entry>/admin/login`.
 
 Admin access is checked by `requireSession` and `requirePermission` in
 `src/middleware/auth.middleware.ts`: the user's `role` must include `admin`. The `users.role`
-column defaults to `admin` (`src/db/schema/auth-schema.ts`), so every new Google sign-in gets
-admin access unless the role is changed.
+column defaults to `user` (`src/db/schema/auth-schema.ts`), so a new Google sign-in has no
+admin access. Grant it by setting that user's `role` to `admin` in the database (the seed does
+this for its admin account).
